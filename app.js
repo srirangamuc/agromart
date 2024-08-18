@@ -8,7 +8,7 @@ const User = require('./models/userModel');
 const app = express();
 
 // Correct MongoDB connection string with the database name 'farmers'
-mongoose.connect('mongodb+srv://freshmart:freshmart@freshmart.mtbq8.mongodb.net/farmers', {
+mongoose.connect("mongodb+srv://freshmart:FDWyAmiXk89asnNd@freshmart.mtbq8.mongodb.net/farmer", {
     // No need for deprecated options anymore
 }).then(() => console.log('Database connection successful'))
   .catch(err => console.error("Database connection error", err));
