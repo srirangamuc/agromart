@@ -1,17 +1,26 @@
-import mongoose from 'mongoose'
+const mongoose = require('mongoose');
 
-class Database{
-    constructor(){
-        this.__connect();
+const userSchema = new mongoose.Schema({
+    name: {
+        type: String,
+        required: true
+    },
+    email: {
+        type: String,
+        required: true,
+        unique: true
+    },
+    password: {
+        type: String,
+        required: true
+    },
+    role: {
+        type: String,
+        enum: ['admin', 'normal', 'farmer'],
+        default: 'normal'
     }
-    __connect(){
-        mongoose.connect('mongodb://localhost:27017/myapp', {
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-        })
-        .then(()=> console.log('Database connection successful'))
-        .catch(()=>console.error("Database connection error",err))
-    }
-}
+});
 
-export default new Database()
+const User = mongoose.model('User', userSchema);
+
+module.exports = User;
