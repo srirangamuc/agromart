@@ -24,11 +24,7 @@ app.use(session({
 app.set('view engine', 'ejs');
 
 app.get('/', (req, res) => {
-    if (req.session.userId) {
-        res.render("index");
-    } else {
-        res.redirect('/login');
-    }
+    res.render("index");
 });
 
 app.get('/login', (req, res) => {
