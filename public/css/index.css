@@ -1,0 +1,103 @@
+@import url(https://fonts.googleapis.com/css?family=Lexend:100,200,300,regular,500,600,700,800,900);
+body {
+    font-family: 'Lexend', sans-serif;
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(to right, #fcece6, #ffffff);
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px;
+    position: relative; /* Ensure it is above other content */
+    z-index: 10;
+}
+
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+    color: #1EBE3A;
+}
+
+nav a {
+    margin: 0 15px;
+    text-decoration: none;
+    color: #000;
+    font-weight: bold;
+}
+
+.sign-up {
+    background-color: #000;
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 20px;
+    text-decoration: none;
+    position: relative; /* Ensure it's not being overlapped */
+    z-index: 10;
+}
+
+.hero-section {
+    display: flex;
+    justify-content: space-between;
+    padding: 50px;
+    background: linear-gradient(to right, #fcece6, #ffffff);
+    height: calc(100vh - 100px);
+    position: relative; /* Ensure proper stacking */
+    z-index: 5;
+}
+
+.hero-content {
+    max-width: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: left;
+    justify-content: center;
+}
+
+.hero-content h1 {
+    font-size: 75px;
+    margin: 0;
+}
+
+.hero-content p {
+    font-size: 18px;
+    margin: 20px 0;
+}
+
+.shop-now-btn {
+    background-color: #FF5400;
+    color: #fff;
+    padding: 15px 30px;
+    width: 20%;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    position: relative; /* Ensure it's clickable */
+    z-index: 10;
+}
+
+.hero-image {
+    display: flex;
+    align-items: center;
+}
+
+.hero-image img {
+    max-width: 100%;
+    height: auto;
+}
+
+.download-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 50px;
+    background-color: #fff;
+}
+
+.download-buttons img {
+    width: 150px;
+    margin: 10px;
+}
