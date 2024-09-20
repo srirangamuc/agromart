@@ -57,6 +57,11 @@ nav a {
     flex-direction: column;
     align-items: left;
     justify-content: center;
+    transition: transform 0.3s;
+}
+.hero-content h1:hover{
+    transform: scale(1.05);
+    transition: transform 0.3s ease-in-out;
 }
 
 .hero-content h1 {

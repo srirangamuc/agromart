@@ -6,35 +6,50 @@ const isAuthenticated = require('../middleware/authMiddleware');
 // POST Route to add a product (Vendor)
 router.post('/add-product', isAuthenticated, async (req, res) => {
     try {
-        const { name, quantity, pricePerKg } = req.body;
+        let { name, quantity, pricePerKg } = req.body;
         const vendorId = req.session.userId; // Retrieve vendor ID from session
 
-        console.log(name);
-        console.log(quantity);
-        console.log(pricePerKg);
-        console.log(vendorId);
+        // Convert quantity and pricePerKg to numbers
+        quantity = parseInt(quantity, 10);  // Convert quantity to an integer
+        pricePerKg = parseFloat(pricePerKg);  // Convert pricePerKg to a floating-point number
 
-        // Ensure all required fields are provided
-        if (!name || quantity === undefined || pricePerKg === undefined || !vendorId) {
-            return res.status(400).send('All fields are required and vendor must be logged in');
+        // Debugging output to verify data types
+        console.log(typeof quantity);  // Should print 'number'
+        console.log(typeof pricePerKg);  // Should print 'number'
+
+        // Ensure all required fields are provided and valid
+        if (!name || isNaN(quantity) || isNaN(pricePerKg) || !vendorId) {
+            return res.status(400).send('All fields are required and must be valid numbers. Vendor must be logged in');
         }
 
-        // Create new product
-        const newItem = new Item({
-            name,
-            quantity,
-            pricePerKg,
-            vendor: vendorId // Directly use the vendorId as it will be handled by Mongoose
-        });
+        // Check if the product already exists for the vendor
+        const existingProduct = await Item.findOne({ name, vendor: vendorId });
 
-        await newItem.save();
-        res.redirect('/vendor')
+        if (existingProduct) {
+            // Update the existing product: add the new quantity and update the price
+            existingProduct.quantity += quantity;  // Correctly add quantities as numbers
+            existingProduct.pricePerKg = pricePerKg;  // Update the price per kg with the new value
+
+            await existingProduct.save();
+            res.redirect('/vendor');
+        } else {
+            // If the product doesn't exist, create a new one
+            const newItem = new Item({
+                name,
+                quantity,
+                pricePerKg,
+                vendor: vendorId
+            });
+
+            await newItem.save();
+            res.redirect('/vendor');
+        }
+
     } catch (error) {
         console.error('Error adding product:', error);
         res.status(500).send('Server error');
     }
 });
-
 // GET Route to fetch products for the vendor
 router.get('/products', isAuthenticated, async (req, res) => {
     try {

@@ -3,9 +3,27 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashbaord</title>
+    <title>Customer Dashboard</title>
+    <link rel="stylesheet" href="css/customer.css">
 </head>
 <body>
-    <h1>Welcome to Dashboard</h1>
+    <header>
+        <h1>Customer Dashboard</h1>
+        <nav>
+            <a href="/logout">Logout</a>
+            <a href="/dashboard">Dashboard</a>
+        </nav>
+    </header>
+    
+    <main>
+        <section class="products-section">
+            <h2>Available Products</h2>
+            <ul id="productsList">
+                <!-- Products will be dynamically inserted here -->
+            </ul>
+        </section>
+    </main>
+
+    <script src="js/customer.js"></script>
 </body>
 </html>

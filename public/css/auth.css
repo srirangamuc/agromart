@@ -7,8 +7,8 @@
 }
 
 body{
-    background-color: #c9d6ff;
-    background: linear-gradient(to right, #e2e2e2, #c9d6ff);
+    background-color: #d2ffc9;
+    background: linear-gradient(to right, #e2e2e2, #d2ffc9);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -49,7 +49,7 @@ body{
 }
 
 .container button{
-    background-color: #512da8;
+    background-color: #2da83d;
     color: #fff;
     font-size: 12px;
     padding: 10px 45px;
@@ -147,12 +147,11 @@ body{
 
 .social-icons a{
     border: 1px solid #ccc;
-    border-radius: 20%;
     display: inline-flex;
-    justify-content: center;
+    justify-content: space-evenly;
     align-items: center;
     margin: 0 3px;
-    width: 40px;
+    width: 200px;
     height: 40px;
 }
 
@@ -174,9 +173,9 @@ body{
 }
 
 .toggle{
-    background-color: #512da8;
+    background-color: #2da842;
     height: 100%;
-    background: linear-gradient(to right, #5c6bc0, #512da8);
+    background: linear-gradient(to right, #5cc075, #2da844);
     color: #fff;
     position: relative;
     left: -100%;
