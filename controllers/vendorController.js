@@ -13,9 +13,7 @@ router.post('/add-product', isAuthenticated, async (req, res) => {
         quantity = parseInt(quantity, 10);  // Convert quantity to an integer
         pricePerKg = parseFloat(pricePerKg);  // Convert pricePerKg to a floating-point number
 
-        // Debugging output to verify data types
-        console.log(typeof quantity);  // Should print 'number'
-        console.log(typeof pricePerKg);  // Should print 'number'
+        
 
         // Ensure all required fields are provided and valid
         if (!name || isNaN(quantity) || isNaN(pricePerKg) || !vendorId) {

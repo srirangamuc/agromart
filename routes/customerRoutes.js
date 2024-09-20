@@ -1,16 +1,15 @@
 const express = require('express');
 const router = express.Router();
-const Item = require('../models/itemModel');
+const customerController = require('../controllers/customerController');
+const isAuthenticated = require('../middleware/authMiddleware');
 
-// GET Route to fetch all products
-router.get('/products', async (req, res) => {
-    try {
-        const products = await Item.find({});
-        res.status(200).json(products);
-    } catch (error) {
-        console.error('Error fetching products:', error);
-        res.status(500).send('Server error');
-    }
-});
+// Customer dashboard (view all unique products)
+router.get('/', isAuthenticated, customerController.getCustomerDashboard);
+
+// View product details
+router.get('/product/:name', isAuthenticated, customerController.getProductDetails);
+
+// Purchase product
+router.post('/buy', isAuthenticated, customerController.buyProduct);
 
 module.exports = router;
