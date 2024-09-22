@@ -22,7 +22,14 @@ exports.login = async (req, res) => {
     const match = await bcrypt.compare(password, user.password);
     if (match) {
         req.session.userId = user._id.toString();
-        console.log(req.session.userId);
+        req.session.userRole = user.role;
+        if (user.role === 'admin') {
+            return res.redirect('/admin'); // Admin dashboard route
+        } else if (user.role === 'vendor') {
+            return res.redirect('/vendor'); // Vendor dashboard route
+        } else {
+            return res.redirect('/customer'); // Customer dashboard route
+        }
         res.redirect('/customer'); // Redirect to a general dashboard
     } else {
         return res.send('Invalid email or password');
