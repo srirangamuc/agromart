@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vendor Dashboard</title>
+    <link rel="stylesheet" href="css/vendor.css">
+</head>
+<body>
+    <header>
+        <h1>Vendor Dashboard</h1>
+        <nav>
+            <a href="/logout">Logout</a>
+            <a href="/dashboard">Dashboard</a>
+        </nav>
+    </header>
+    
+    <main>
+        <section class="form-section">
+            <h2>Add New Product</h2>
+            <form id="addProductForm" action="/vendor/add-product" method="POST">
+                <label for="name">Product Name:</label>
+                <input type="text" id="name" name="name" required>
+
+                <label for="quantity">Quantity (kg):</label>
+                <input type="number" id="quantity" name="quantity" required>
+
+                <label for="pricePerKg">Price per kg:</label>
+                <input type="number" id="pricePerKg" name="pricePerKg" step="0.01" required>
+
+                <button type="submit">Add Product</button>
+            </form>
+        </section>
+
+        <section class="products-section"></section>
+            <h2>Available Products</h2>
+            <ul id="productsList">
+                <% products.forEach(product => { %>
+                    <li>
+                        Name: <%= product.name %>, 
+                        Quantity: <%= product.quantity %> kg, 
+                        Price per kg: $<%= product.pricePerKg %>
+                    </li>
+                <% }) %>
+            </ul>
+        </section>
+    </main>
+
+    <script src="js/vendor.js"></script>
+</body>
+</html>

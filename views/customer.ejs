@@ -1,0 +1,8 @@
+<h1>Customer Dashboard</h1>
+<ul>
+  <% products.forEach(product => { %>
+    <li>
+      <a href="/customer/product/<%= product._id %>"><%= product._id %></a>
+    </li>
+  <% }); %>
+</ul>
