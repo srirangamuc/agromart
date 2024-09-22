@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customer Dashboard</title>
+</head>
+<body>
+    <h1>Available Products</h1>
+    <ul>
+        <% items.forEach(item => { %>
+            <li>
+                <h3><%= item.name %></h3>
+                <p>Price per kg: ₹<%= item.pricePerKg %></p> <!-- Display price in INR -->
+                <form action="/customer/add-to-cart" method="POST">
+                    <input type="hidden" name="itemId" value="<%= item._id %>">
+                    <input type="number" name="quantity" min="1" value="1" required>
+                    <button type="submit">Add to Cart</button>
+                </form>
+            </li>
+        <% }); %>
+    </ul>
+
+    <h1>Your Cart</h1>
+    <ul>
+        <% if (user.cart.length > 0) { %>
+            <% user.cart.forEach(cartItem => { %>
+                <li>
+                    <h3><%= cartItem.item.name %></h3>
+                    <p>Quantity: <%= cartItem.quantity %></p>
+                    <p>Price: ₹<%= cartItem.item.pricePerKg * cartItem.quantity %></p> <!-- Show total price for this item -->
+                </li>
+            <% }); %>
+        <% } else { %>
+            <p>Your cart is empty.</p>
+        <% } %>
+    </ul>
+    
+    <h2>Checkout</h2>
+    <form action="/customer/checkout" method="POST">
+        <label>
+            <input type="radio" name="paymentMethod" value="COD" checked> Cash on Delivery
+        </label>
+        <label>
+            <input type="radio" name="paymentMethod" value="stripe"> Stripe
+        </label>
+        <button type="submit">Checkout</button>
+    </form>
+</body>
+</html>

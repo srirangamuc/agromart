@@ -20,7 +20,12 @@ const userSchema = new mongoose.Schema({
         type: String,
         enum: ['admin', 'customer', 'vendor'],
         default: 'normal'
-    }
+    },
+    cart:[{
+        item:{type:mongoose.Schema.Types.ObjectId,ref:'Item'},
+        quantity:{type:Number,required:true}
+    }]
+
 });
 
 // Create the model from the schema

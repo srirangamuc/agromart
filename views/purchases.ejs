@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Purchases</title>
+</head>
+<body>
+    <h1>Your Purchases</h1>
+    <table>
+        <thead>
+            <tr>
+                <th>Date of Purchase</th>
+                <th>Item Name</th>
+                <th>Quantity</th>
+                <th>Price per Unit</th>
+                <th>Total Price</th>
+                <th>Status</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% purchases.forEach(purchase => { %>
+                <% purchase.items.forEach(item => { %>
+                    <tr>
+                        <td><%= purchase.dateString %></td>
+                        <td><%= item.name %></td>
+                        <td><%= item.quantity %></td>
+                        <td>₹<%= item.pricePerKg %></td>
+                        <td>₹<%= item.pricePerKg * item.quantity %></td>
+                        <td><%= purchase.status %></td>
+                    </tr>
+                <% }); %>
+            <% }); %>
+        </tbody>
+    </table>
+    <a href="/customer">Go back to Dashboard</a>
+</body>
+</html>

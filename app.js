@@ -6,7 +6,7 @@ const authController = require('./controllers/authController');
 const dashboardController = require('./controllers/dashboardController');
 const vendorRoutes = require('./controllers/vendorController');
 const bodyParser = require('body-parser')
-// const customerRoutes = require('./routes/customerRoutes');
+const customerRoutes = require('./routes/customerRoutes');
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -46,7 +46,8 @@ app.get('/vendor', dashboardController.getVendorDashboard);
 
 
 app.use('/vendor',vendorRoutes)
-// app.use('/customer', customerRoutes);
+app.use('/customer', customerRoutes);
+
 app.listen(5000, () => {
     console.log('Server is running on port 5000');
 });
