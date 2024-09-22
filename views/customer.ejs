@@ -1,8 +1,203 @@
-<h1>Customer Dashboard</h1>
-<ul>
-  <% products.forEach(product => { %>
-    <li>
-      <a href="/customer/product/<%= product._id %>"><%= product._id %></a>
-    </li>
-  <% }); %>
-</ul>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AgroMart - Customer Dashboard</title>
+  <link rel="stylesheet" href="/styles.css"> <!-- Assuming you have a CSS file for styling -->
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+    }
+
+    header {
+      background-color: #4CAF50;
+      padding: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .logo {
+      color: white;
+      font-size: 24px;
+    }
+    nav a {
+      color: white;
+      margin-left: 15px;
+      text-decoration: none;
+    }
+    nav a:hover {
+      text-decoration: underline;
+    }
+
+    .dropdown {
+      position: relative;
+      display: inline-block;
+    }
+    .dropdown-content {
+      display: none;
+      position: absolute;
+      background-color: #f9f9f9;
+      min-width: 160px;
+      box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+      z-index: 1;
+      right: 0;
+    }
+    .dropdown-content a {
+      color: black;
+      padding: 12px 16px;
+      text-decoration: none;
+      display: block;
+    }
+    .dropdown-content a:hover {
+      background-color: #f1f1f1;
+    }
+    .dropdown:hover .dropdown-content {
+      display: block;
+    }
+
+    #profileSection, #cartSection {
+      display: none;
+      margin-top: 20px;
+    }
+    form, #cartSection {
+      margin-top: 15px;
+    }
+    input[type="text"], input[type="email"], input[type="password"] {
+      padding: 8px;
+      width: 100%;
+      margin: 5px 0;
+    }
+    button {
+      padding: 10px 15px;
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #45a049;
+    }
+    #dashboard {
+      margin-top: 20px;
+    }
+
+    .cart-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .cart-item button {
+      margin-left: 10px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">AgroMart</div>
+  <nav>
+    <a href="/">Home</a>
+
+    <!-- Dropdown for user -->
+    <div class="dropdown">
+      <a href="#" id="userDropdown"><%= user.name %> ▼</a> <!-- Display username -->
+      <div class="dropdown-content">
+        <a href="#" id="profileLink">Profile</a>
+        <a href="#" id="cartLink">Cart</a>
+        <a href="/logout">Logout</a>
+      </div>
+    </div>
+  </nav>
+</header>
+
+<!-- Customer Dashboard (Initially Visible) -->
+<div id="dashboard">
+  <h1>Customer Dashboard</h1>
+  <ul>
+    <% products.forEach(product => { %>
+      <li>
+        <a href="/customer/product/<%= product._id %>"><%= product._id %></a>
+      </li>
+    <% }); %>
+  </ul>
+</div>
+
+<!-- Profile Section (Initially Hidden) -->
+<div id="profileSection">
+  <h2>Your Profile</h2>
+  <form action="/customer/profile" method="POST">
+    <label for="name">Name:</label>
+    <input type="text" id="name" name="name" value="<%= user.name %>" required>
+
+    <label for="email">Email:</label>
+    <input type="email" id="email" name="email" value="<%= user.email %>" required>
+
+    <label for="password">Password (leave blank if not changing):</label>
+    <input type="password" id="password" name="password">
+
+    <button type="submit">Update Profile</button>
+  </form>
+</div>
+
+<!-- Cart Section (Initially Hidden) -->
+<div id="cartSection">
+  <h2>Your Cart</h2>
+  <ul>
+    <% cart.forEach(item => { %>
+      <li class="cart-item">
+        <div>
+          <strong>Product:</strong> <%= item.product %>, 
+          <strong>Quantity:</strong> <%= item.quantity %>, 
+          <strong>Total Price:</strong> $<%= item.totalPrice.toFixed(2) %>
+        </div>
+        <!-- Quantity Update Form -->
+        <div>
+          <form action="/customer/cart/update" method="POST" style="display:inline;">
+            <input type="hidden" name="productId" value="<%= item._id %>">
+            <button type="submit" name="action" value="increase">+</button>
+            <button type="submit" name="action" value="decrease">-</button>
+          </form>
+          <!-- Delete Item Form -->
+          <form action="/customer/cart/delete" method="POST" style="display:inline;">
+            <input type="hidden" name="productId" value="<%= item._id %>">
+            <button type="submit">Delete</button>
+          </form>
+        </div>
+      </li>
+    <% }); %>
+  </ul>
+
+  <!-- Buy Button -->
+  <form action="/customer/checkout" method="GET">
+    <button type="submit">Buy Now</button>
+  </form>
+</div>
+
+<script>
+  document.getElementById('profileLink').addEventListener('click', function(e) {
+    e.preventDefault();
+    const profileSection = document.getElementById('profileSection');
+    const cartSection = document.getElementById('cartSection');
+    const dashboard = document.getElementById('dashboard');
+
+    profileSection.style.display = profileSection.style.display === 'none' || profileSection.style.display === '' ? 'block' : 'none';
+    cartSection.style.display = 'none';  // Hide cart when profile is shown
+    dashboard.style.display = profileSection.style.display === 'block' ? 'none' : 'block';
+  });
+
+  document.getElementById('cartLink').addEventListener('click', function(e) {
+    e.preventDefault();
+    const profileSection = document.getElementById('profileSection');
+    const cartSection = document.getElementById('cartSection');
+    const dashboard = document.getElementById('dashboard');
+
+    cartSection.style.display = cartSection.style.display === 'none' || cartSection.style.display === '' ? 'block' : 'none';
+    profileSection.style.display = 'none';  // Hide profile when cart is shown
+    dashboard.style.display = cartSection.style.display === 'block' ? 'none' : 'block';
+  });
+</script>
+
+</body>
+</html>

@@ -11,5 +11,13 @@ router.get('/product/:name', isAuthenticated, customerController.getProductDetai
 
 // Purchase product
 router.post('/buy', isAuthenticated, customerController.buyProduct);
+// router.get('/profile', customerController.getProfile);
+
+// POST route for updating profile
+router.post('/profile/update', customerController.updateProfile);
+
+router.post('/cart/update',customerController.updateCartQuantity);
+
+
 
 module.exports = router;

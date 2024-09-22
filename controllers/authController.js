@@ -23,7 +23,7 @@ exports.login = async (req, res) => {
     if (match) {
         req.session.userId = user._id.toString();
         console.log(req.session.userId);
-        res.redirect('/dashboard'); // Redirect to a general dashboard
+        res.redirect('/customer'); // Redirect to a general dashboard
     } else {
         return res.send('Invalid email or password');
     }
@@ -46,11 +46,11 @@ exports.signup = async (req, res) => {
 
     await newUser.save();
     req.session.userId = newUser._id;
-    res.redirect('/dashboard'); // Redirect to a general dashboard
+    res.redirect('/customer'); // Redirect to a general dashboard
 };
 
 // Logout route
 exports.logout = (req, res) => {
     req.session.destroy();
-    res.redirect('/login');
+    res.redirect('/');
 };
