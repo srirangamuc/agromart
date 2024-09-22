@@ -3,6 +3,19 @@ const router = express.Router();
 const Item = require('../models/itemModel');
 const isAuthenticated = require('../middleware/authMiddleware');
 
+// Predefined list of allowed fruits and vegetables
+const allowedProducts = [
+    "Apple", "Banana", "Orange", "Grapes", "Strawberry", "Blueberry", "Watermelon",
+    "Pineapple", "Mango", "Peach", "Plum", "Cherry", "Kiwi", "Lemon", "Lime", "Avocado",
+    "Carrot", "Broccoli", "Spinach", "Kale", "Tomato", "Cucumber", "Bell Pepper", "Zucchini",
+    "Eggplant", "Potato", "Sweet Potato", "Onion", "Garlic", "Radish", "Beetroot"
+];
+
+// Helper function to capitalize the first letter of each word
+function capitalizeFirstLetter(string) {
+    return string.replace(/\b\w/g, char => char.toUpperCase());
+}
+
 // POST Route to add a product (Vendor)
 router.post('/add-product', isAuthenticated, async (req, res) => {
     try {
@@ -11,13 +24,19 @@ router.post('/add-product', isAuthenticated, async (req, res) => {
 
         // Convert quantity and pricePerKg to numbers
         quantity = parseInt(quantity, 10);  // Convert quantity to an integer
-        pricePerKg = parseFloat(pricePerKg);  // Convert pricePerKg to a floating-point number
-
-        
+        pricePerKg = parseInt(pricePerKg);  // Convert pricePerKg to a floating-point number
 
         // Ensure all required fields are provided and valid
         if (!name || isNaN(quantity) || isNaN(pricePerKg) || !vendorId) {
-            return res.status(400).send('All fields are required and must be valid numbers. Vendor must be logged in');
+            return res.status(400).send('All fields are required and must be valid numbers. Vendor must be logged in.');
+        }
+
+        // Capitalize the product name
+        name = capitalizeFirstLetter(name);
+
+        // Check if the product is in the allowed list
+        if (!allowedProducts.includes(name)) {
+            return res.status(400).send('Product is not allowed. Please select from the list of allowed fruits and vegetables.');
         }
 
         // Check if the product already exists for the vendor
@@ -48,6 +67,7 @@ router.post('/add-product', isAuthenticated, async (req, res) => {
         res.status(500).send('Server error');
     }
 });
+
 // GET Route to fetch products for the vendor
 router.get('/products', isAuthenticated, async (req, res) => {
     try {
