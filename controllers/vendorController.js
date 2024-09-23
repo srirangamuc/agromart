@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const Item = require('../models/itemModel');
+const Vendor = require('../models/vendorModel'); // Require the new vendorModel
 const isAuthenticated = require('../middleware/authMiddleware');
 
 // Predefined list of allowed fruits and vegetables
@@ -40,28 +41,39 @@ router.post('/add-product', isAuthenticated, async (req, res) => {
         }
 
         // Check if the product already exists for the vendor
-        const existingProduct = await Item.findOne({name});
+        const existingProduct = await Item.findOne({ name });
 
         if (existingProduct) {
             // Calculate the new average price
-            const newTotalPrice = (existingProduct.pricePerKg * existingProduct.quantity + pricePerKg * quantity) / (existingProduct.quantity + quantity);
+            const newTotalPrice = 1.1*((existingProduct.pricePerKg * existingProduct.quantity + pricePerKg * quantity) / (existingProduct.quantity + quantity));
             existingProduct.pricePerKg = newTotalPrice; // Update the average price
             existingProduct.quantity += quantity; // Update the quantity
 
             await existingProduct.save();
-            res.redirect('/vendor');
         } else {
             // If the product doesn't exist, create a new one
             const newItem = new Item({
                 name,
                 quantity,
-                pricePerKg,
+                pricePerKg
             });
 
             await newItem.save();
-            res.redirect('/vendor');
         }
 
+        // Add the item to the vendor's own collection (Vendor Model)
+        const profit = quantity * pricePerKg;
+        const vendorItem = new Vendor({
+            vendor: vendorId, // Reference to the vendor (User)
+            itemName: name,
+            quantity,
+            pricePerKg,
+            profit // Calculate and store profit
+        });
+
+        await vendorItem.save();
+
+        res.redirect('/vendor');
     } catch (error) {
         console.error('Error adding product:', error);
         res.status(500).send('Server error');

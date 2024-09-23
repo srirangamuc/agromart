@@ -2,6 +2,7 @@ const User = require('../models/userModel');
 const Purchase = require('../models/purchaseModel');
 const Item = require('../models/itemModel');
 const bcrypt = require('bcrypt');
+// const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY); // Add your Stripe secret key
 
 // Get customer dashboard
 exports.getCustomerDashBoard = async (req, res) => {
@@ -79,7 +80,6 @@ exports.addToCart = async (req, res) => {
 };
 
 // Checkout functionality
-// Checkout functionality
 exports.checkout = async (req, res) => {
     const { paymentMethod } = req.body;
 
@@ -112,6 +112,18 @@ exports.checkout = async (req, res) => {
             });
             await purchase.save();
 
+            // Update item quantities in the Item collection
+            for (const cartItem of itemsToPurchase) {
+                const item = await Item.findById(cartItem.item._id);
+                if (item) {
+                    item.quantity -= cartItem.quantity; // Reduce the quantity
+                    if (item.quantity < 0) {
+                        item.quantity = 0; // Ensure quantity doesn't go below 0
+                    }
+                    await item.save();
+                }
+            }
+
             // Clear the cart after purchase
             user.cart = [];
             await user.save(); // Save the updated user with cleared cart
@@ -142,6 +154,28 @@ exports.checkout = async (req, res) => {
                 });
 
                 res.redirect(303, session.url);
+
+                // After successful payment, update item quantities and clear cart
+                const updateItemsAndClearCart = async () => {
+                    for (const cartItem of itemsToPurchase) {
+                        const item = await Item.findById(cartItem.item._id);
+                        if (item) {
+                            item.quantity -= cartItem.quantity; // Reduce the quantity
+                            if (item.quantity < 0) {
+                                item.quantity = 0; // Ensure quantity doesn't go below 0
+                            }
+                            await item.save();
+                        }
+                    }
+
+                    // Clear the cart after purchase
+                    user.cart = [];
+                    await user.save();
+                };
+
+                // Execute after successful Stripe payment
+                await updateItemsAndClearCart();
+
             } catch (error) {
                 console.error("Stripe checkout error:", error);
                 res.status(500).send("Payment error");
@@ -152,8 +186,6 @@ exports.checkout = async (req, res) => {
         res.status(500).send("Server error");
     }
 };
-
-
 
 // Update profile
 exports.updateProfile = async (req, res) => {
