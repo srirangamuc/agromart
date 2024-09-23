@@ -34,12 +34,18 @@ exports.addToCart = async (req, res) => {
             return res.status(404).send('User not found');
         }
 
+        // Convert quantity to integer
+        const quantityInt = parseInt(quantity, 10);
+        if (isNaN(quantityInt) || quantityInt <= 0) {
+            return res.status(400).send('Invalid quantity');
+        }
+
         // Check if item already exists in the user's cart
         const existingItem = user.cart.find(item => item.item.equals(itemId));
         if (existingItem) {
-            existingItem.quantity += quantity; // Update quantity
+            existingItem.quantity += quantityInt; // Update quantity
         } else {
-            user.cart.push({ item: itemId, quantity }); // Add new item to cart
+            user.cart.push({ item: itemId, quantity: quantityInt }); // Add new item to cart
         }
 
         await user.save(); // Save the updated user with cart
