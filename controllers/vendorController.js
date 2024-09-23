@@ -5,7 +5,7 @@ const isAuthenticated = require('../middleware/authMiddleware');
 
 // Predefined list of allowed fruits and vegetables
 const allowedProducts = [
-    "Apple", "Banana", "Orange", "Grapes", "Strawberry", "Blueberry", "Watermelon",
+    "Apple", "Banana", "Orange", "Black Grapes", "Grapes","Strawberry", "Blueberry", "Watermelon",
     "Pineapple", "Mango", "Peach", "Plum", "Cherry", "Kiwi", "Lemon", "Lime", "Avocado",
     "Carrot", "Broccoli", "Spinach", "Kale", "Tomato", "Cucumber", "Bell Pepper", "Zucchini",
     "Eggplant", "Potato", "Sweet Potato", "Onion", "Garlic", "Radish", "Beetroot"
