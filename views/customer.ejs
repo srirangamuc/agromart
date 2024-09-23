@@ -94,20 +94,19 @@
 <body>
 
     <h1>Available Products</h1>
-<ul>
-    <% items.forEach(item => { %>
-        <li>
-            <h3><%= item.name %></h3>
-            <p>Average Price per kg: ₹<%= item.averagePrice %></p>
-            <form action="/customer/add-to-cart" method="POST">
-                <input type="hidden" name="itemId" value="<%= item._id %>">
-                <input type="number" name="quantity" min="1" value="1" required>
-                <button type="submit">Add to Cart</button>
-            </form>
-        </li>
-    <% }); %>
-</ul>
-
+    <ul>
+        <% items.forEach(item => { %>
+            <li>
+                <h3><%= item.name %></h3>
+                <p>Average Price per kg: ₹<%= item.averagePrice %></p>
+                <form action="/customer/add-to-cart" method="POST">
+                    <input type="hidden" name="itemId" value="<%= item._id %>">
+                    <input type="number" name="quantity" min="1" value="1" required>
+                    <button type="submit">Add to Cart</button>
+                </form>
+            </li>
+        <% }); %>
+    </ul>
 
     <h1>Your Cart</h1>
     <div class="cart-section">
@@ -115,9 +114,13 @@
             <% if (user.cart.length > 0) { %>
                 <% user.cart.forEach(cartItem => { %>
                     <li>
-                        <h3><%= cartItem.item.name %></h3>
-                        <p>Quantity: <%= cartItem.quantity %></p>
-                        <p>Price: ₹<%= cartItem.item.pricePerKg * cartItem.quantity %></p>
+                        <% if (cartItem.item) { %>
+                            <h3><%= cartItem.item.name %></h3>
+                            <p>Quantity: <%= cartItem.quantity %></p>
+                            <p>Price: ₹<%= (cartItem.item.pricePerKg * cartItem.quantity).toFixed(2) %></p>
+                        <% } else { %>
+                            <p>Item not found.</p>
+                        <% } %>
                     </li>
                 <% }); %>
             <% } else { %>
@@ -126,17 +129,18 @@
         </ul>
     </div>
 
-
     <!-- Checkout section -->
     <h2>Checkout</h2>
-    <div class="checkout-section">
-        <form action="/customer/checkout" method="POST">
-            <label>
-                <input type="radio" name="paymentMethod" value="COD" checked> Cash on Delivery
-            </label>
-            <button type="submit">Checkout</button>
-        </form>
-    </div>
+    <form action="/customer/checkout" method="POST">
+        <label>
+            <input type="radio" name="paymentMethod" value="COD" checked> Cash on Delivery
+        </label>
+        <label>
+            <input type="radio" name="paymentMethod" value="stripe"> Stripe
+        </label>
+        <button type="submit">Checkout</button>
+    </form>
+
 
     <!-- Profile update button -->
     <a href="/customer/update-profile" class="profile-button">Update Profile</a>

@@ -43,8 +43,6 @@ exports.getCustomerDashBoard = async (req, res) => {
     }
 };
 
-
-
 // Add item to cart
 exports.addToCart = async (req, res) => {
     try {
@@ -81,7 +79,10 @@ exports.addToCart = async (req, res) => {
 };
 
 // Checkout functionality
+// Checkout functionality
 exports.checkout = async (req, res) => {
+    const { paymentMethod } = req.body;
+
     try {
         const user = await User.findById(req.session.userId).populate('cart.item');
 
@@ -89,27 +90,70 @@ exports.checkout = async (req, res) => {
             return res.status(400).send("User not found.");
         }
 
-        const purchase = new Purchase({
-            user: user._id,
-            items: user.cart.map(cartItem => ({
-                item: cartItem.item._id,
-                name: cartItem.item.name,
-                quantity: cartItem.quantity,
-                pricePerKg: cartItem.item.pricePerKg
-            })),
-            purchaseDate: new Date(),
-            status: 'received'
-        });
+        // Check for valid items in the cart
+        const itemsToPurchase = user.cart.filter(cartItem => cartItem.item);
 
-        await purchase.save();
-        user.cart = [];
-        await user.save();
-        res.redirect('/customer/purchases');
+        if (itemsToPurchase.length === 0) {
+            return res.status(400).send("Your cart is empty or contains invalid items.");
+        }
+
+        if (paymentMethod === 'COD') {
+            // Create a new purchase
+            const purchase = new Purchase({
+                user: user._id,
+                items: itemsToPurchase.map(cartItem => ({
+                    item: cartItem.item._id,
+                    name: cartItem.item.name,
+                    quantity: cartItem.quantity,
+                    pricePerKg: cartItem.item.pricePerKg // Include price
+                })),
+                purchaseDate: new Date(), // Add purchase date
+                status: 'received' // Default status
+            });
+            await purchase.save();
+
+            // Clear the cart after purchase
+            user.cart = [];
+            await user.save(); // Save the updated user with cleared cart
+
+            res.redirect('/customer/purchases');
+        } else if (paymentMethod === 'stripe') {
+            const totalAmount = itemsToPurchase.reduce((total, cartItem) => {
+                return total + (cartItem.item.pricePerKg * cartItem.quantity);
+            }, 0);
+
+            try {
+                // Create Stripe checkout session
+                const session = await stripe.checkout.sessions.create({
+                    payment_method_types: ['card'],
+                    line_items: itemsToPurchase.map(cartItem => ({
+                        price_data: {
+                            currency: 'inr', // Set currency to INR
+                            product_data: {
+                                name: cartItem.item.name,
+                            },
+                            unit_amount: Math.round(cartItem.item.pricePerKg * 100), // Amount in paisa (1 INR = 100 paisa)
+                        },
+                        quantity: cartItem.quantity,
+                    })),
+                    mode: 'payment',
+                    success_url: `${req.protocol}://${req.get('host')}/customer/success`,
+                    cancel_url: `${req.protocol}://${req.get('host')}/customer/cancel`,
+                });
+
+                res.redirect(303, session.url);
+            } catch (error) {
+                console.error("Stripe checkout error:", error);
+                res.status(500).send("Payment error");
+            }
+        }
     } catch (error) {
         console.error("Checkout error:", error);
         res.status(500).send("Server error");
     }
 };
+
+
 
 // Update profile
 exports.updateProfile = async (req, res) => {
@@ -155,7 +199,6 @@ exports.logout = (req, res) => {
     });
 };
 
-
 // Get user's purchases
 exports.getPurchases = async (req, res) => {
     try {
@@ -173,4 +216,3 @@ exports.getPurchases = async (req, res) => {
         res.status(500).send("Server error");
     }
 };
-

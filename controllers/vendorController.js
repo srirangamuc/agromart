@@ -23,8 +23,8 @@ router.post('/add-product', isAuthenticated, async (req, res) => {
         const vendorId = req.session.userId; // Retrieve vendor ID from session
 
         // Convert quantity and pricePerKg to numbers
-        quantity = parseInt(quantity, 10);  // Convert quantity to an integer
-        pricePerKg = parseInt(pricePerKg);  // Convert pricePerKg to a floating-point number
+        quantity = parseInt(quantity, 10);
+        pricePerKg = parseFloat(pricePerKg); // Ensure it's a float
 
         // Ensure all required fields are provided and valid
         if (!name || isNaN(quantity) || isNaN(pricePerKg) || !vendorId) {
@@ -40,12 +40,13 @@ router.post('/add-product', isAuthenticated, async (req, res) => {
         }
 
         // Check if the product already exists for the vendor
-        const existingProduct = await Item.findOne({ name, vendor: vendorId });
+        const existingProduct = await Item.findOne({name});
 
         if (existingProduct) {
-            // Update the existing product: add the new quantity and update the price
-            existingProduct.quantity += quantity;  // Correctly add quantities as numbers
-            existingProduct.pricePerKg = pricePerKg;  // Update the price per kg with the new value
+            // Calculate the new average price
+            const newTotalPrice = (existingProduct.pricePerKg * existingProduct.quantity + pricePerKg * quantity) / (existingProduct.quantity + quantity);
+            existingProduct.pricePerKg = newTotalPrice; // Update the average price
+            existingProduct.quantity += quantity; // Update the quantity
 
             await existingProduct.save();
             res.redirect('/vendor');
@@ -55,7 +56,6 @@ router.post('/add-product', isAuthenticated, async (req, res) => {
                 name,
                 quantity,
                 pricePerKg,
-                vendor: vendorId
             });
 
             await newItem.save();
