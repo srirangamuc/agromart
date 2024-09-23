@@ -4,47 +4,147 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Customer Dashboard</title>
+    <style>
+        /* Basic styling for the page */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1, h2 {
+            color: #2e7d32;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        ul li {
+            background-color: white;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        h3 {
+            margin: 0 0 10px 0;
+            color: #2e7d32;
+        }
+
+        p {
+            margin: 5px 0;
+        }
+
+        form {
+            margin-top: 10px;
+        }
+
+        input[type="number"], input[type="radio"] {
+            padding: 5px;
+            font-size: 1em;
+        }
+
+        button {
+            background-color: #2e7d32;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #1b5e20;
+        }
+
+        .cart-section {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .checkout-section {
+            background-color: white;
+            padding: 20px;
+            margin-top: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .profile-button {
+            background-color: #2e7d32;
+            color: white;
+            padding: 10px 20px;
+            margin-top: 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            display: inline-block;
+        }
+
+        .profile-button:hover {
+            background-color: #1b5e20;
+        }
+    </style>
 </head>
 <body>
+
     <h1>Available Products</h1>
-    <ul>
-        <% items.forEach(item => { %>
-            <li>
-                <h3><%= item.name %></h3>
-                <p>Price per kg: ₹<%= item.pricePerKg %></p> <!-- Display price in INR -->
-                <form action="/customer/add-to-cart" method="POST">
-                    <input type="hidden" name="itemId" value="<%= item._id %>">
-                    <input type="number" name="quantity" min="1" value="1" required>
-                    <button type="submit">Add to Cart</button>
-                </form>
-            </li>
-        <% }); %>
-    </ul>
+<ul>
+    <% items.forEach(item => { %>
+        <li>
+            <h3><%= item.name %></h3>
+            <p>Average Price per kg: ₹<%= item.averagePrice %></p>
+            <form action="/customer/add-to-cart" method="POST">
+                <input type="hidden" name="itemId" value="<%= item._id %>">
+                <input type="number" name="quantity" min="1" value="1" required>
+                <button type="submit">Add to Cart</button>
+            </form>
+        </li>
+    <% }); %>
+</ul>
+
 
     <h1>Your Cart</h1>
-    <ul>
-        <% if (user.cart.length > 0) { %>
-            <% user.cart.forEach(cartItem => { %>
-                <li>
-                    <h3><%= cartItem.item.name %></h3>
-                    <p>Quantity: <%= cartItem.quantity %></p>
-                    <p>Price: ₹<%= cartItem.item.pricePerKg * cartItem.quantity %></p> <!-- Show total price for this item -->
-                </li>
-            <% }); %>
-        <% } else { %>
-            <p>Your cart is empty.</p>
-        <% } %>
-    </ul>
-    
+    <div class="cart-section">
+        <ul>
+            <% if (user.cart.length > 0) { %>
+                <% user.cart.forEach(cartItem => { %>
+                    <li>
+                        <h3><%= cartItem.item.name %></h3>
+                        <p>Quantity: <%= cartItem.quantity %></p>
+                        <p>Price: ₹<%= cartItem.item.pricePerKg * cartItem.quantity %></p>
+                    </li>
+                <% }); %>
+            <% } else { %>
+                <p>Your cart is empty.</p>
+            <% } %>
+        </ul>
+    </div>
+
+
+    <!-- Checkout section -->
     <h2>Checkout</h2>
-    <form action="/customer/checkout" method="POST">
-        <label>
-            <input type="radio" name="paymentMethod" value="COD" checked> Cash on Delivery
-        </label>
-        <label>
-            <input type="radio" name="paymentMethod" value="stripe"> Stripe
-        </label>
-        <button type="submit">Checkout</button>
+    <div class="checkout-section">
+        <form action="/customer/checkout" method="POST">
+            <label>
+                <input type="radio" name="paymentMethod" value="COD" checked> Cash on Delivery
+            </label>
+            <button type="submit">Checkout</button>
+        </form>
+    </div>
+
+    <!-- Profile update button -->
+    <a href="/customer/update-profile" class="profile-button">Update Profile</a>
+
+    <!-- Logout button -->
+    <form action="/customer/logout" method="POST">
+        <button type="submit" class="profile-button">Logout</button>
     </form>
+
 </body>
 </html>

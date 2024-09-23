@@ -4,35 +4,27 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Your Purchases</title>
+    <style>
+        /* Add some basic styling here */
+    </style>
 </head>
 <body>
     <h1>Your Purchases</h1>
-    <table>
-        <thead>
-            <tr>
-                <th>Date of Purchase</th>
-                <th>Item Name</th>
-                <th>Quantity</th>
-                <th>Price per Unit</th>
-                <th>Total Price</th>
-                <th>Status</th>
-            </tr>
-        </thead>
-        <tbody>
-            <% purchases.forEach(purchase => { %>
-                <% purchase.items.forEach(item => { %>
-                    <tr>
-                        <td><%= purchase.dateString %></td>
-                        <td><%= item.name %></td>
-                        <td><%= item.quantity %></td>
-                        <td>₹<%= item.pricePerKg %></td>
-                        <td>₹<%= item.pricePerKg * item.quantity %></td>
-                        <td><%= purchase.status %></td>
-                    </tr>
-                <% }); %>
-            <% }); %>
-        </tbody>
-    </table>
-    <a href="/customer">Go back to Dashboard</a>
+    <ul>
+        <% purchases.forEach(purchase => { %>
+            <li>
+                <h3>Purchase Date: <%= purchase.purchaseDate.toDateString() %></h3>
+                <ul>
+                    <% purchase.items.forEach(item => { %>
+                        <li>
+                            <p><%= item.name %> - Quantity: <%= item.quantity %> - Price: ₹<%= item.pricePerKg * item.quantity %></p>
+                        </li>
+                    <% }); %>
+                </ul>
+                <p>Status: <%= purchase.status %></p>
+            </li>
+        <% }); %>
+    </ul>
+    <a href="/customer">Back to Dashboard</a>
 </body>
 </html>
