@@ -1,0 +1,88 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+h1 {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.product-cards {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+    padding: 20px;
+}
+
+.product-card {
+    width: 200px; /* Adjust width as necessary */
+    height: 300px; /* Increased height for better layout */
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    color: black; /* Changed text color to ensure visibility */
+    background: radial-gradient(circle at center, rgba(255, 105, 180, 0.8), rgba(255, 0, 0, 0.8));
+}
+
+.card-middle {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden; /* Hide overflow for better image fitting */
+}
+
+.card-middle img {
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    object-fit: cover; /* Ensure the image covers the area */
+}
+
+.card-bottom {
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.price {
+    margin: 10px 0;
+}
+
+.price-large {
+    font-size: 24px; /* Large text for price */
+    font-weight: bold;
+}
+
+.price-small {
+    font-size: 14px; /* Smaller text for "per kg" */
+}
+
+.quantity-cart {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.quantity-input {
+    width: 50px; /* Adjust as necessary */
+}
+
+.add-to-cart-button {
+    background-color: #005baa;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.add-to-cart-button:hover {
+    background-color: #003f7f;
+}

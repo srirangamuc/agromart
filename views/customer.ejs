@@ -25,6 +25,7 @@
     <ul>
         <% if (user.cart.length > 0) { %>
             <% user.cart.forEach(cartItem => { %>
+                
                 <li>
                     <h3><%= cartItem.item.name %></h3>
                     <p>Quantity: <%= cartItem.quantity %></p>
