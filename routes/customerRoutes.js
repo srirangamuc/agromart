@@ -20,6 +20,8 @@ router.get('/update-profile', (req, res) => {
 router.get('/purchases', customerController.getPurchases); 
 router.post('/update-profile', customerController.updateProfile);
 
+router.get('/success',customerController.getSucess)
+router.get('/failure',customerController.getFaliure)
 // Logout
 router.post('/logout', customerController.logout);
 

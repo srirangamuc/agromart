@@ -2,7 +2,11 @@ const User = require('../models/userModel');
 const Purchase = require('../models/purchaseModel');
 const Item = require('../models/itemModel');
 const bcrypt = require('bcrypt');
-// const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY); // Add your Stripe secret key
+const STRIPE_SECRET_KEY='sk_test_51Q1BEGDvKfDjvcpCsEqOVgaKLyoDU660JD41lqYzQU3G9KUsvFmcDiJ72dLMexorHUr4rC91KPBmMeiJxDZlpgru00gDvBILze'
+// console.log(STRIPE_SECRET_KEY)
+const stripe = require('stripe')(STRIPE_SECRET_KEY);
+// const dotenv = require('dotenv');
+// dotenv.config();
 
 // Get customer dashboard
 exports.getCustomerDashBoard = async (req, res) => {
@@ -80,6 +84,7 @@ exports.addToCart = async (req, res) => {
 };
 
 // Checkout functionality
+// Checkout functionality
 exports.checkout = async (req, res) => {
     const { paymentMethod } = req.body;
 
@@ -98,7 +103,7 @@ exports.checkout = async (req, res) => {
         }
 
         if (paymentMethod === 'COD') {
-            // Create a new purchase
+            // Create a new purchase for COD
             const purchase = new Purchase({
                 user: user._id,
                 items: itemsToPurchase.map(cartItem => ({
@@ -155,8 +160,9 @@ exports.checkout = async (req, res) => {
 
                 res.redirect(303, session.url);
 
-                // After successful payment, update item quantities and clear cart
-                const updateItemsAndClearCart = async () => {
+                // After successful payment, update item quantities, save the purchase, and clear cart
+                const updateItemsAndSavePurchase = async () => {
+                    // Update item quantities
                     for (const cartItem of itemsToPurchase) {
                         const item = await Item.findById(cartItem.item._id);
                         if (item) {
@@ -168,13 +174,27 @@ exports.checkout = async (req, res) => {
                         }
                     }
 
+                    // Create a new purchase after successful payment
+                    const purchase = new Purchase({
+                        user: user._id,
+                        items: itemsToPurchase.map(cartItem => ({
+                            item: cartItem.item._id,
+                            name: cartItem.item.name,
+                            quantity: cartItem.quantity,
+                            pricePerKg: cartItem.item.pricePerKg // Include price
+                        })),
+                        purchaseDate: new Date(),
+                        status: 'received' // Default status
+                    });
+                    await purchase.save();
+
                     // Clear the cart after purchase
                     user.cart = [];
-                    await user.save();
+                    await user.save(); // Save the updated user with cleared cart
                 };
 
                 // Execute after successful Stripe payment
-                await updateItemsAndClearCart();
+                await updateItemsAndSavePurchase();
 
             } catch (error) {
                 console.error("Stripe checkout error:", error);
@@ -186,6 +206,7 @@ exports.checkout = async (req, res) => {
         res.status(500).send("Server error");
     }
 };
+
 
 // Update profile
 exports.updateProfile = async (req, res) => {
@@ -227,7 +248,7 @@ exports.logout = (req, res) => {
         if (err) {
             return res.status(500).send('Failed to logout');
         }
-        res.redirect('/login');
+        res.redirect('/');
     });
 };
 
@@ -248,3 +269,10 @@ exports.getPurchases = async (req, res) => {
         res.status(500).send("Server error");
     }
 };
+exports.getSucess = (req, res) => {
+    res.render('success');
+};
+
+exports.getFaliure = (req,res) =>{
+    res.render('failure');
+}

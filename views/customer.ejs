@@ -98,7 +98,7 @@
         <% items.forEach(item => { %>
             <li>
                 <h3><%= item.name %></h3>
-                <p>Average Price per kg: ₹<%= item.averagePrice %></p>
+                <p>Price: ₹<%= item.averagePrice %></p>
                 <form action="/customer/add-to-cart" method="POST">
                     <input type="hidden" name="itemId" value="<%= item._id %>">
                     <input type="number" name="quantity" min="1" value="1" required>

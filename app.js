@@ -10,6 +10,9 @@ const customerRoutes = require('./routes/customerRoutes');
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 
+const dotenv = require('dotenv');
+dotenv.config();
+
 
 // MongoDB connection with error handling
 mongoose.connect("mongodb+srv://freshmart:FDWyAmiXk89asnNd@freshmart.mtbq8.mongodb.net/farmer", {})

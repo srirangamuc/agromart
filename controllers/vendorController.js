@@ -45,7 +45,7 @@ router.post('/add-product', isAuthenticated, async (req, res) => {
 
         if (existingProduct) {
             // Calculate the new average price
-            const newTotalPrice = 1.1*((existingProduct.pricePerKg * existingProduct.quantity + pricePerKg * quantity) / (existingProduct.quantity + quantity));
+            const newTotalPrice = 1.1*((existingProduct.pricePerKg+ pricePerKg) / (2));
             existingProduct.pricePerKg = newTotalPrice; // Update the average price
             existingProduct.quantity += quantity; // Update the quantity
 
