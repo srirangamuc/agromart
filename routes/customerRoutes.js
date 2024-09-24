@@ -8,6 +8,11 @@ router.get('/', customerController.getCustomerDashBoard);
 // Add item to cart
 router.post('/add-to-cart', customerController.addToCart);
 
+
+// Add route to delete an item from the cart
+router.post('/delete-from-cart', customerController.deleteFromCart);
+
+
 // Checkout
 router.post('/checkout', customerController.checkout);
 

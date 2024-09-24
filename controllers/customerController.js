@@ -83,6 +83,34 @@ exports.addToCart = async (req, res) => {
     }
 };
 
+
+
+// Delete item from cart
+exports.deleteFromCart = async (req, res) => {
+    try {
+        const { itemId } = req.body;
+        const userId = req.session.userId;
+
+        if (!userId) {
+            return res.status(401).send('User not authenticated');
+        }
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).send('User not found');
+        }
+
+        // Find the item in the cart and remove it
+        user.cart = user.cart.filter(cartItem => !cartItem.item.equals(itemId));
+
+        await user.save();
+        res.redirect('/customer');
+    } catch (error) {
+        console.error('Error in deleteFromCart:', error);
+        res.status(500).send('Server error');
+    }
+};
+
 // Checkout functionality
 // Checkout functionality
 exports.checkout = async (req, res) => {

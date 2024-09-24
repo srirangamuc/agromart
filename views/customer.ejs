@@ -67,6 +67,18 @@
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
+        .delete-button {
+            background-color: red;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    
+        .delete-button:hover {
+            background-color: darkred;
+        }
 
         .checkout-section {
             background-color: white;
@@ -109,25 +121,29 @@
     </ul>
 
     <h1>Your Cart</h1>
-    <div class="cart-section">
-        <ul>
-            <% if (user.cart.length > 0) { %>
-                <% user.cart.forEach(cartItem => { %>
-                    <li>
-                        <% if (cartItem.item) { %>
-                            <h3><%= cartItem.item.name %></h3>
-                            <p>Quantity: <%= cartItem.quantity %></p>
-                            <p>Price: ₹<%= (cartItem.item.pricePerKg * cartItem.quantity).toFixed(2) %></p>
-                        <% } else { %>
-                            <p>Item not found.</p>
-                        <% } %>
-                    </li>
-                <% }); %>
-            <% } else { %>
-                <p>Your cart is empty.</p>
-            <% } %>
-        </ul>
-    </div>
+<div class="cart-section">
+    <ul>
+        <% if (user.cart.length > 0) { %>
+            <% user.cart.forEach(cartItem => { %>
+                <li>
+                    <% if (cartItem.item) { %>
+                        <h3><%= cartItem.item.name %></h3>
+                        <p>Quantity: <%= cartItem.quantity %></p>
+                        <p>Price: ₹<%= (cartItem.item.pricePerKg * cartItem.quantity).toFixed(2) %></p>
+                        <form action="/customer/delete-from-cart" method="POST">
+                            <input type="hidden" name="itemId" value="<%= cartItem.item._id %>">
+                            <button type="submit" class="delete-button">Delete</button>
+                        </form>
+                    <% } else { %>
+                        <p>Item not found.</p>
+                    <% } %>
+                </li>
+            <% }); %>
+        <% } else { %>
+            <p>Your cart is empty.</p>
+        <% } %>
+    </ul>
+</div>
 
     <!-- Checkout section -->
     <h2>Checkout</h2>
