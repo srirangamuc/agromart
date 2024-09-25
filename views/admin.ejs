@@ -5,63 +5,146 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
     <link rel="stylesheet" href="/path/to/your/css/styles.css"> <!-- Update with your CSS file -->
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        header {
+            background-color: #2ecc71; /* Green theme */
+            color: white;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        h1, h2 {
+            color: #2ecc71;
+        }
+
+        h1 {
+            margin-bottom: 0;
+        }
+
+        main {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 20px auto;
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        ul li {
+            background-color: #ecf0f1;
+            padding: 10px;
+            margin-bottom: 5px;
+            border-radius: 4px;
+        }
+
+        ul li:nth-child(odd) {
+            background-color: #bdc3c7;
+        }
+
+        /* Additional styling */
+        h2 {
+            border-bottom: 2px solid #2ecc71;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        h3 {
+            margin-top: 30px;
+            color: #27ae60;
+        }
+    </style>
 </head>
 <body>
-    <h1>Admin Dashboard</h1>
+    <header>
+        <h1>Admin Dashboard</h1>
+    </header>
 
-    <h2>Purchases</h2>
-    <table>
-        <thead>
-            <tr>
-                <th>User Name</th>
-                <th>Email</th>
-                <th>Items Ordered</th>
-                <th>Total Amount</th>
-                <th>Status</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            <% purchases.forEach(purchase => { %>
+    <main>
+        <!-- Purchases Section -->
+        <h2>Purchases</h2>
+        <table>
+            <thead>
                 <tr>
-                    <td><%= purchase.user.name %></td>
-                    <td><%= purchase.user.email %></td>
-                    <td>
-                        <ul>
-                            <% purchase.items.forEach(item => { %>
-                                <li><%= item.name %> (Quantity: <%= item.quantity %>)</li>
-                            <% }) %>
-                        </ul>
-                    </td>
-                    <td><%= purchase.totalAmount %></td>
-                    <td>
-                        <form action="/admin/update-purchase-status" method="POST">
-                            <input type="hidden" name="purchaseId" value="<%= purchase._id %>">
-                            <select name="status">
-                                <option value="received" <%= purchase.status === 'received' ? 'selected' : '' %>>Received</option>
-                                <option value="pending" <%= purchase.status === 'pending' ? 'selected' : '' %>>Pending</option>
-                                <option value="delivered" <%= purchase.status === 'delivered' ? 'selected' : '' %>>Delivered</option>
-                            </select>
-                            <button type="submit">Update</button>
-                        </form>
-                    </td>
+                    <th>User Name</th>
+                    <th>Email</th>
+                    <th>Items Ordered</th>
+                    <th>Total Amount</th>
+                    <th>Status</th>
+                    <th>Action</th>
                 </tr>
+            </thead>
+            <tbody>
+                <% purchases.forEach(purchase => { %>
+                    <tr>
+                        <td><%= purchase.user.name %></td>
+                        <td><%= purchase.user.email %></td>
+                        <td>
+                            <ul>
+                                <% purchase.items.forEach(item => { %>
+                                    <li><%= item.name %> (Quantity: <%= item.quantity %>)</li>
+                                <% }) %>
+                            </ul>
+                        </td>
+                        <td>$<%= purchase.totalAmount %></td>
+                        <td>
+                            <form action="/admin/update-purchase-status" method="POST">
+                                <input type="hidden" name="purchaseId" value="<%= purchase._id %>">
+                                <select name="status">
+                                    <option value="received" <%= purchase.status === 'received' ? 'selected' : '' %>>Received</option>
+                                    <option value="pending" <%= purchase.status === 'pending' ? 'selected' : '' %>>Pending</option>
+                                    <option value="delivered" <%= purchase.status === 'delivered' ? 'selected' : '' %>>Delivered</option>
+                                </select>
+                                <button type="submit">Update</button>
+                            </form>
+                        </td>
+                    </tr>
+                <% }) %>
+            </tbody>
+        </table>
+
+        <!-- Customers Section -->
+        <h2>Customers</h2>
+        <h3>Pro Plus Customers</h3>
+        <ul>
+            <% proPlusCustomers.forEach(customer => { %>
+                <li><%= customer.name %> - <%= customer.email %></li>
             <% }) %>
-        </tbody>
-    </table>
+        </ul>
 
-    <h2>Recently Added Customers</h2>
-    <ul>
-        <% customers.forEach(customer => { %>
-            <li><%= customer.name %> - <%= customer.email %></li>
-        <% }) %>
-    </ul>
+        <h3>Pro Customers</h3>
+        <ul>
+            <% proCustomers.forEach(customer => { %>
+                <li><%= customer.name %> - <%= customer.email %></li>
+            <% }) %>
+        </ul>
 
-    <h2>Recently Added Vendors</h2>
-    <ul>
-        <% vendors.forEach(vendor => { %>
-            <li><%= vendor.name %> - <%= vendor.email %></li>
-        <% }) %>
-    </ul>
+        <h3>Normal Customers</h3>
+        <ul>
+            <% normalCustomers.forEach(customer => { %>
+                <li><%= customer.name %> - <%= customer.email %></li>
+            <% }) %>
+        </ul>
+
+        <!-- Vendors Section -->
+        <h2>Vendors</h2>
+        <ul>
+            <% vendors.forEach(vendor => { %>
+                <li><%= vendor.name %> - <%= vendor.email %></li>
+            <% }) %>
+        </ul>
+    </main>
 </body>
 </html>
