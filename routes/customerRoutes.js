@@ -15,9 +15,6 @@ router.post('/delete-from-cart', customerController.deleteFromCart);
 router.post('/checkout', customerController.checkout);
 
 // Update profile
-router.get('/update-profile', (req, res) => {
-    res.render('update-profile'); // Render profile update page
-});
 router.post('/update-profile', customerController.updateProfile);
 
 // Purchases
