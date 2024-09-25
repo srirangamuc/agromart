@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Your Purchases</title>
     <style>
-        /* Add some basic styling here */
+        
     </style>
 </head>
 <body>
@@ -17,10 +17,11 @@
                 <ul>
                     <% purchase.items.forEach(item => { %>
                         <li>
-                            <p><%= item.name %> - Quantity: <%= item.quantity %> - Price: ₹<%= item.pricePerKg * item.quantity %></p>
+                            <p><%= item.name %> - Quantity: <%= item.quantity %></p>
                         </li>
                     <% }); %>
                 </ul>
+                <p>Price: ₹<%= purchase.totalAmount %></p>
                 <p>Status: <%= purchase.status %></p>
             </li>
         <% }); %>

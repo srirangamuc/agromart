@@ -25,8 +25,14 @@ router.get('/update-profile', (req, res) => {
 router.get('/purchases', customerController.getPurchases); 
 router.post('/update-profile', customerController.updateProfile);
 
+router.post('/subscribe', customerController.purchaseSubscription);
+router.get('/success-subscription', customerController.successSubscription);
+router.get('/cancel', customerController.cancelPayment);
+
+
 router.get('/success',customerController.getSucess)
 router.get('/failure',customerController.getFaliure)
+
 // Logout
 router.post('/logout', customerController.logout);
 

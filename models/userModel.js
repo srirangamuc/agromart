@@ -24,8 +24,12 @@ const userSchema = new mongoose.Schema({
     cart:[{
         item:{type:mongoose.Schema.Types.ObjectId,ref:'Item'},
         quantity:{type:Number,required:true}
-    }]
-
+    }],
+    subscription: {
+        type: String,
+        enum: ['normal', 'pro', 'pro plus'],
+        default: 'normal'
+    }
 });
 
 // Create the model from the schema

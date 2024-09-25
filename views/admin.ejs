@@ -3,11 +3,65 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Site - Agromart</title>
+    <title>Admin Dashboard</title>
+    <link rel="stylesheet" href="/path/to/your/css/styles.css"> <!-- Update with your CSS file -->
 </head>
 <body>
-    <h1>Welcome Admin</h1>
-    <h3>Monitor over here</h3>
-    
+    <h1>Admin Dashboard</h1>
+
+    <h2>Purchases</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>User Name</th>
+                <th>Email</th>
+                <th>Items Ordered</th>
+                <th>Total Amount</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% purchases.forEach(purchase => { %>
+                <tr>
+                    <td><%= purchase.user.name %></td>
+                    <td><%= purchase.user.email %></td>
+                    <td>
+                        <ul>
+                            <% purchase.items.forEach(item => { %>
+                                <li><%= item.name %> (Quantity: <%= item.quantity %>)</li>
+                            <% }) %>
+                        </ul>
+                    </td>
+                    <td><%= purchase.totalAmount %></td>
+                    <td>
+                        <form action="/admin/update-purchase-status" method="POST">
+                            <input type="hidden" name="purchaseId" value="<%= purchase._id %>">
+                            <select name="status">
+                                <option value="received" <%= purchase.status === 'received' ? 'selected' : '' %>>Received</option>
+                                <option value="pending" <%= purchase.status === 'pending' ? 'selected' : '' %>>Pending</option>
+                                <option value="delivered" <%= purchase.status === 'delivered' ? 'selected' : '' %>>Delivered</option>
+                            </select>
+                            <button type="submit">Update</button>
+                        </form>
+                    </td>
+                </tr>
+            <% }) %>
+        </tbody>
+    </table>
+
+    <h2>Recently Added Customers</h2>
+    <ul>
+        <% customers.forEach(customer => { %>
+            <li><%= customer.name %> - <%= customer.email %></li>
+        <% }) %>
+    </ul>
+
+    <h2>Recently Added Vendors</h2>
+    <ul>
+        <% vendors.forEach(vendor => { %>
+            <li><%= vendor.name %> - <%= vendor.email %></li>
+        <% }) %>
+    </ul>
 </body>
 </html>

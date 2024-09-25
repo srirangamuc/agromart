@@ -33,6 +33,10 @@ const purchaseSchema = new mongoose.Schema({
         type: String,
         enum: ['pending', 'received', 'delivered'],
         default: 'received' // Default status
+    },
+    totalAmount:{
+        type:Number,
+        required:true
     }
 });
 

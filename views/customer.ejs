@@ -67,6 +67,7 @@
             border-radius: 8px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
+
         .delete-button {
             background-color: red;
             color: white;
@@ -75,7 +76,7 @@
             border-radius: 5px;
             cursor: pointer;
         }
-    
+
         .delete-button:hover {
             background-color: darkred;
         }
@@ -101,9 +102,51 @@
         .profile-button:hover {
             background-color: #1b5e20;
         }
+
+        .subscription-button {
+            background-color: #ff9800;
+            color: white;
+            padding: 10px 20px;
+            margin-top: 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            display: inline-block;
+        }
+
+        .subscription-button:hover {
+            background-color: #e65100;
+        }
+
+        .subscription-section {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .subscription-plan {
+            background-color: #fff3e0;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+        .total-price {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #2e7d32;
+            margin-top: 10px;
+        }
     </style>
 </head>
 <body>
+    <h1>Welcome, <%= user.name %>!</h1>
+    <% if (user.subscription === 'pro') { %>
+        <h2>You are a Pro User!</h2>
+    <% } else if (user.subscription === 'pro plus') { %>
+        <h2>You are a Pro Plus User!</h2>
+    <% } %>
 
     <h1>Available Products</h1>
     <ul>
@@ -121,29 +164,58 @@
     </ul>
 
     <h1>Your Cart</h1>
-<div class="cart-section">
-    <ul>
-        <% if (user.cart.length > 0) { %>
-            <% user.cart.forEach(cartItem => { %>
-                <li>
-                    <% if (cartItem.item) { %>
-                        <h3><%= cartItem.item.name %></h3>
-                        <p>Quantity: <%= cartItem.quantity %></p>
-                        <p>Price: ₹<%= (cartItem.item.pricePerKg * cartItem.quantity).toFixed(2) %></p>
-                        <form action="/customer/delete-from-cart" method="POST">
-                            <input type="hidden" name="itemId" value="<%= cartItem.item._id %>">
-                            <button type="submit" class="delete-button">Delete</button>
-                        </form>
-                    <% } else { %>
-                        <p>Item not found.</p>
-                    <% } %>
-                </li>
-            <% }); %>
-        <% } else { %>
-            <p>Your cart is empty.</p>
+    <div class="cart-section">
+        <ul>
+            <% if (user.cart.length > 0) { %>
+                <% user.cart.forEach(cartItem => { %>
+                    <li>
+                        <% if (cartItem.item) { %>
+                            <h3><%= cartItem.item.name %></h3>
+                            <p>Quantity: <%= cartItem.quantity %></p>
+                            <p>Price: ₹<%= (cartItem.item.pricePerKg * cartItem.quantity).toFixed(2) %></p>
+                            <form action="/customer/delete-from-cart" method="POST">
+                                <input type="hidden" name="itemId" value="<%= cartItem.item._id %>">
+                                <button type="submit" class="delete-button">Delete</button>
+                            </form>
+                        <% } else { %>
+                            <p>Item not found.</p>
+                        <% } %>
+                    </li>
+                <% }); %>
+            <% } else { %>
+                <p>Your cart is empty.</p>
+            <% } %>
+        </ul>
+        <div class="total-price">
+            Total Price: ₹<span id="total-price"><%= user.cart.reduce((total, cartItem) => total + (cartItem.item.pricePerKg * cartItem.quantity), 0).toFixed(2) %></span>
+        </div>
+    </div>
+
+
+    <% if (user.subscription !== 'pro plus') { %>
+    <div class="subscription-section">
+        <h2>Unlock Pro Features</h2>
+        <p>Get your orders delivered faster with our subscription plans!</p>
+
+        <% if (user.subscription === 'normal') { %>
+            <div class="subscription-plan">
+                <h3>Pro Plan - ₹599/year</h3>
+                <form action="/customer/subscribe" method="POST">
+                    <input type="hidden" name="plan" value="pro">
+                    <button class="subscription-button" type="submit">Subscribe to Pro</button>
+                </form>
+            </div>
         <% } %>
-    </ul>
-</div>
+
+        <div class="subscription-plan">
+            <h3>Pro Plus Plan - ₹899/year</h3>
+            <form action="/customer/subscribe" method="POST">
+                <input type="hidden" name="plan" value="pro plus">
+                <button class="subscription-button" type="submit">Subscribe to Pro Plus</button>
+            </form>
+        </div>
+    </div>
+    <% } %>
 
     <!-- Checkout section -->
     <h2>Checkout</h2>
@@ -156,7 +228,6 @@
         </label>
         <button type="submit">Checkout</button>
     </form>
-
 
     <!-- Profile update button -->
     <a href="/customer/update-profile" class="profile-button">Update Profile</a>

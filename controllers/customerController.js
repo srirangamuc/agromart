@@ -17,8 +17,8 @@ exports.getCustomerDashBoard = async (req, res) => {
             return res.status(401).send('User not authenticated');
         }
 
-        const userWithCart = await User.findById(userId).populate('cart.item'); // Ensure this populates correctly
-        const items = await Item.find();
+        const userWithCart = await User.findById(userId).populate('cart.item');
+        const items = await Item.find({quantity:{$gt:0}});
 
         // Create a unique item list with average prices
         const uniqueItems = {};
@@ -40,14 +40,12 @@ exports.getCustomerDashBoard = async (req, res) => {
             ...item,
             averagePrice: (item.total / item.count).toFixed(2) // Calculate average price
         }));
-
-        res.render('customer', { items: displayItems, user: userWithCart });
+        res.render('customer',{items:displayItems,user:userWithCart})
     } catch (error) {
         console.error("Error fetching customer dashboard:", error);
         res.status(500).send("Server error");
     }
 };
-
 // Add item to cart
 exports.addToCart = async (req, res) => {
     try {
@@ -112,7 +110,6 @@ exports.deleteFromCart = async (req, res) => {
 };
 
 // Checkout functionality
-// Checkout functionality
 exports.checkout = async (req, res) => {
     const { paymentMethod } = req.body;
 
@@ -123,15 +120,38 @@ exports.checkout = async (req, res) => {
             return res.status(400).send("User not found.");
         }
 
-        // Check for valid items in the cart
+        // Filter out any invalid items from the cart
         const itemsToPurchase = user.cart.filter(cartItem => cartItem.item);
 
         if (itemsToPurchase.length === 0) {
             return res.status(400).send("Your cart is empty or contains invalid items.");
         }
 
+        // Check for sufficient quantity in stock for each item
+        for (const cartItem of itemsToPurchase) {
+            const item = await Item.findById(cartItem.item._id);
+            if (!item || item.quantity < cartItem.quantity || item.quantity <= 0) {
+                return res.status(400).send(`Insufficient quantity for item: ${cartItem.item.name}`);
+            }
+        }
+
+        // Calculate the total amount
+        const totalAmount = itemsToPurchase.reduce((total, cartItem) => {
+            return total + (cartItem.item.pricePerKg * cartItem.quantity);
+        }, 0);
+
+        // Apply discounts based on the user's subscription
+        let discount = 0;
+        if (user.subscription === 'pro') {
+            discount = totalAmount * 0.10; // 10% discount
+        } else if (user.subscription === 'pro plus') {
+            discount = totalAmount * 0.20; // 20% discount
+        }
+
+        const finalAmount = totalAmount - discount;
+
         if (paymentMethod === 'COD') {
-            // Create a new purchase for COD
+            // Handle Cash on Delivery (COD) payment method
             const purchase = new Purchase({
                 user: user._id,
                 items: itemsToPurchase.map(cartItem => ({
@@ -140,100 +160,81 @@ exports.checkout = async (req, res) => {
                     quantity: cartItem.quantity,
                     pricePerKg: cartItem.item.pricePerKg // Include price
                 })),
-                purchaseDate: new Date(), // Add purchase date
-                status: 'received' // Default status
+                purchaseDate: new Date(),
+                status: 'received',
+                totalAmount: finalAmount // Store the final amount in the purchase
             });
             await purchase.save();
 
-            // Update item quantities in the Item collection
+            // Update item quantities and remove items with 0 quantity
             for (const cartItem of itemsToPurchase) {
                 const item = await Item.findById(cartItem.item._id);
                 if (item) {
-                    item.quantity -= cartItem.quantity; // Reduce the quantity
-                    if (item.quantity < 0) {
-                        item.quantity = 0; // Ensure quantity doesn't go below 0
+                    item.quantity -= cartItem.quantity; // Reduce item quantity
+                    if (item.quantity <= 0) {
+                        await Item.findByIdAndDelete(item._id); // Delete item if quantity is 0
+                    } else {
+                        await item.save(); // Save updated item if not deleted
                     }
-                    await item.save();
                 }
             }
 
-            // Clear the cart after purchase
+            // Clear the user's cart after purchase
             user.cart = [];
-            await user.save(); // Save the updated user with cleared cart
+            await user.save();
 
-            res.redirect('/customer/purchases');
+            return res.redirect('/customer/purchases');
         } else if (paymentMethod === 'stripe') {
-            const totalAmount = itemsToPurchase.reduce((total, cartItem) => {
-                return total + (cartItem.item.pricePerKg * cartItem.quantity);
-            }, 0);
-
+            // Handle Stripe payment method
             try {
-                // Create Stripe checkout session
                 const session = await stripe.checkout.sessions.create({
                     payment_method_types: ['card'],
-                    line_items: itemsToPurchase.map(cartItem => ({
+                    line_items: [{
                         price_data: {
-                            currency: 'inr', // Set currency to INR
+                            currency: 'inr',
                             product_data: {
-                                name: cartItem.item.name,
+                                name: 'Total Purchase', // Name for the Stripe product
                             },
-                            unit_amount: Math.round(cartItem.item.pricePerKg * 100), // Amount in paisa (1 INR = 100 paisa)
+                            unit_amount: Math.round(finalAmount * 100), // Convert amount to the smallest currency unit
                         },
-                        quantity: cartItem.quantity,
-                    })),
+                        quantity: 1, // Quantity should be 1 since we are sending total price
+                    }],
                     mode: 'payment',
                     success_url: `${req.protocol}://${req.get('host')}/customer/success`,
                     cancel_url: `${req.protocol}://${req.get('host')}/customer/cancel`,
                 });
 
-                res.redirect(303, session.url);
-
-                // After successful payment, update item quantities, save the purchase, and clear cart
-                const updateItemsAndSavePurchase = async () => {
-                    // Update item quantities
-                    for (const cartItem of itemsToPurchase) {
-                        const item = await Item.findById(cartItem.item._id);
-                        if (item) {
-                            item.quantity -= cartItem.quantity; // Reduce the quantity
-                            if (item.quantity < 0) {
-                                item.quantity = 0; // Ensure quantity doesn't go below 0
-                            }
+                 // Update the stock and clear the cart after payment
+                 for (const cartItem of itemsToPurchase) {
+                    const item = await Item.findById(cartItem.item._id);
+                    if (item) {
+                        item.quantity -= cartItem.quantity;
+                        if (item.quantity <= 0) {
+                            await Item.findByIdAndDelete(item._id);
+                        } else {
                             await item.save();
                         }
                     }
+                }
 
-                    // Create a new purchase after successful payment
-                    const purchase = new Purchase({
-                        user: user._id,
-                        items: itemsToPurchase.map(cartItem => ({
-                            item: cartItem.item._id,
-                            name: cartItem.item.name,
-                            quantity: cartItem.quantity,
-                            pricePerKg: cartItem.item.pricePerKg // Include price
-                        })),
-                        purchaseDate: new Date(),
-                        status: 'received' // Default status
-                    });
-                    await purchase.save();
+                user.cart = [];
+                await user.save();
 
-                    // Clear the cart after purchase
-                    user.cart = [];
-                    await user.save(); // Save the updated user with cleared cart
-                };
-
-                // Execute after successful Stripe payment
-                await updateItemsAndSavePurchase();
+                return res.redirect(303, session.url);
 
             } catch (error) {
                 console.error("Stripe checkout error:", error);
-                res.status(500).send("Payment error");
+                return res.status(500).send("Payment error");
             }
         }
     } catch (error) {
         console.error("Checkout error:", error);
-        res.status(500).send("Server error");
+        return res.status(500).send("Server error");
     }
 };
+
+
+
 
 
 // Update profile
@@ -304,3 +305,72 @@ exports.getSucess = (req, res) => {
 exports.getFaliure = (req,res) =>{
     res.render('failure');
 }
+// New function for subscription purchase
+exports.purchaseSubscription = async (req, res) => {
+    const { plan } = req.body; // 'pro' or 'pro plus'
+    const userId = req.session.userId;
+
+    try {
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).send('User not found');
+        }
+
+        let amount;
+        if (plan === 'pro') {
+            amount = 59900; // ₹599 in paisa
+        } else if (plan === 'pro plus') {
+            amount = 89900; // ₹899 in paisa
+        } else {
+            return res.status(400).send('Invalid plan');
+        }
+
+        // Create Stripe checkout session
+        const session = await stripe.checkout.sessions.create({
+            payment_method_types: ['card'],
+            line_items: [{
+                price_data: {
+                    currency: 'inr',
+                    product_data: {
+                        name: `${plan} subscription`,
+                    },
+                    unit_amount: amount,
+                },
+                quantity: 1,
+            }],
+            mode: 'payment',
+            success_url: `${req.protocol}://${req.get('host')}/customer/success-subscription?plan=${plan}`,
+            cancel_url: `${req.protocol}://${req.get('host')}/customer/cancel`,
+        });
+
+        res.redirect(303, session.url);
+    } catch (error) {
+        console.error('Stripe subscription error:', error);
+        res.status(500).send('Server error');
+    }
+};
+
+// Subscription success handler
+exports.successSubscription = async (req, res) => {
+    const { plan } = req.query; // 'pro' or 'pro plus'
+    const userId = req.session.userId;
+
+    try {
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).send('User not found');
+        }
+
+        // Update user's subscription plan
+        user.subscription = plan;
+        await user.save();
+
+        res.redirect('/customer');
+    } catch (error) {
+        console.error('Subscription success error:', error);
+        res.status(500).send('Server error');
+    }
+};
+exports.cancelPayment = (req, res) => {
+    res.render('cancel'); // Render the cancel EJS page
+};
