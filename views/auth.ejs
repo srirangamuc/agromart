@@ -7,44 +7,52 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
     <link rel="stylesheet" href="css/auth.css">
     <title>Let's Signup - Agromart</title>
+    <style>
+        .error {
+            color: red;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+    </style>
 </head>
-
 <body>
 
     <div class="container" id="container">
         <!-- Sign Up Form -->
         <div class="form-container sign-up">
-            <form action="/signup" method="POST">
+            <form action="/signup" method="POST" id="signupForm">
                 <h1>Create Account</h1>
                 <div class="social-icons">
                     <a href="#" class="icon"><i class="fa-brands fa-google"> Google </i></a>
                 </div>
                 <span>or use your email for registration</span>
-                <!-- Add name attributes to the input fields -->
                 <input type="text" name="name" placeholder="Name" required>
-                <input type="email" name="email" placeholder="Email" required>
-                <input type="password" name="password" placeholder="Password" required>
+                <input type="email" id="signupEmail" name="email" placeholder="Email" required>
+                <div id="signupEmailError" class="error"></div>
+                <input type="password" id="signupPassword" name="password" placeholder="Password" required>
+                <div id="signupPasswordError" class="error"></div>
                 <select name="role" required>
                     <option value="" disabled selected>What are you?</option>
                     <option value="admin">Admin</option>
                     <option value="customer">Customer</option>
                     <option value="vendor">Vendor</option>
-                </select>                
+                </select>
                 <button type="submit">Sign Up</button>
             </form>
         </div>
 
         <!-- Sign In Form -->
         <div class="form-container sign-in">
-            <form action="/login" method="POST">
+            <form action="/login" method="POST" id="loginForm">
                 <h1>Sign In</h1>
                 <div class="social-icons">
-                    <a href="#" class="icon"><i class="fa-brands fa-google">      Google      </i></a>
+                    <a href="#" class="icon"><i class="fa-brands fa-google"> Google </i></a>
                 </div>
                 <span>or use your email for login</span>
-                <!-- Add name attributes to the input fields -->
-                <input type="email" name="email" placeholder="Email" required>
-                <input type="password" name="password" placeholder="Password" required>
+                <input type="email" id="loginEmail" name="email" placeholder="Email" required>
+                <div id="loginEmailError" class="error"></div>
+                <input type="password" id="loginPassword" name="password" placeholder="Password" required>
+                <div id="loginPasswordError" class="error"></div>
                 <a href="#">Forgot Your Password?</a>
                 <button type="submit">Sign In</button>
             </form>
@@ -66,8 +74,62 @@
             </div>
         </div>
     </div>
-
     <script src="js/auth.js"></script>
+    <script>
+        // Email validation function using regex
+        function validateEmail(email) {
+            const emailRegex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+            return emailRegex.test(email);
+        }
+
+        // Password validation function using regex
+        function validatePassword(password) {
+            const passwordRegex = /^(?=.*[A-Z])(?=.*\d)[A-Za-z\d]{8,}$/;
+            return passwordRegex.test(password);
+        }
+
+        // Signup form validation (dynamic)
+        document.getElementById('signupEmail').addEventListener('input', function () {
+            const email = this.value;
+            const errorDiv = document.getElementById('signupEmailError');
+            if (!validateEmail(email)) {
+                errorDiv.textContent = "Please enter a valid email address.";
+            } else {
+                errorDiv.textContent = "";
+            }
+        });
+
+        document.getElementById('signupPassword').addEventListener('input', function () {
+            const password = this.value;
+            const errorDiv = document.getElementById('signupPasswordError');
+            if (!validatePassword(password)) {
+                errorDiv.textContent = "Password must be at least 8 characters long, with at least one capital letter and one number.";
+            } else {
+                errorDiv.textContent = "";
+            }
+        });
+
+        // Login form validation (dynamic)
+        document.getElementById('loginEmail').addEventListener('input', function () {
+            const email = this.value;
+            const errorDiv = document.getElementById('loginEmailError');
+            if (!validateEmail(email)) {
+                errorDiv.textContent = "Please enter a valid email address.";
+            } else {
+                errorDiv.textContent = "";
+            }
+        });
+
+        document.getElementById('loginPassword').addEventListener('input', function () {
+            const password = this.value;
+            const errorDiv = document.getElementById('loginPasswordError');
+            if (!validatePassword(password)) {
+                errorDiv.textContent = "Password must be at least 8 characters long, with at least one capital letter and one number.";
+            } else {
+                errorDiv.textContent = "";
+            }
+        });
+    </script>
 </body>
 
 </html>
