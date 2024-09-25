@@ -1,7 +1,8 @@
 const Item = require('../models/itemModel');
 const Vendor = require('../models/vendorModel');
-
+const User = require('../models/userModel');
 // Predefined list of allowed fruits and vegetables
+const bcrypt = require('bcrypt');
 const allowedProducts = [
     "Apple", "Banana", "Orange", "Grapes", "Strawberry", "Blueberry", "Watermelon",
     "Pineapple", "Mango", "Peach", "Plum", "Cherry", "Kiwi", "Lemon", "Lime", "Avocado",
@@ -76,17 +77,58 @@ async function getProducts(req, res) {
 }
 
 // Function to fetch the customer dashboard
+// Function to fetch the vendor dashboard
 async function getVendorDashboard(req, res) {
     try {
-        // Logic to fetch necessary data for the customer dashboard
-        const products = await Item.find({}).exec(); // Example: fetching all items
+        const vendorId = req.session.userId;
 
-        res.render('vendor', { products }); // Render the customer dashboard template
+        // Fetch products for the specific vendor
+        const products = await Vendor.find({ vendor: vendorId });
+
+        // Fetch vendor profile
+        const vendorProfile = await User.findById(vendorId);
+
+        res.render('vendor', { products, vendorProfile }); // Pass the vendor profile data to the template
     } catch (error) {
-        console.error('Error fetching customer dashboard:', error);
+        console.error('Error fetching vendor dashboard:', error);
         res.status(500).send('Server error');
     }
 }
+
+
+// Update profile
+async function updateProfile (req, res) {
+    try {
+        const userId = req.session.userId;
+        if (!userId) {
+            return res.status(401).send('User not authenticated');
+        }
+
+        const { username, password } = req.body;
+
+        const user = await User.findById(userId);
+        if (!user) {
+            return res.status(404).send('User not found');
+        }
+
+        if (username) {
+            user.name = username;
+        }
+
+        if (password) {
+            // Hash the new password before saving
+            const saltRounds = 10;
+            const hashedPassword = await bcrypt.hash(password, saltRounds);
+            user.password = hashedPassword;
+        }
+
+        await user.save();
+        res.redirect('/vendor');
+    } catch (error) {
+        console.error("Profile update error:", error);
+        res.status(500).send("Server error");
+    }
+};
 
 // Helper function to capitalize the first letter of each word
 function capitalizeFirstLetter(string) {
@@ -97,5 +139,6 @@ function capitalizeFirstLetter(string) {
 module.exports = {
     addProduct,
     getProducts,
-    getVendorDashboard
+    getVendorDashboard,
+    updateProfile
 };

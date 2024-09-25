@@ -46,7 +46,7 @@
             box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
         }
 
-        .form-section, .products-section {
+        .form-section, .products-section, .profile-section {
             margin-bottom: 2rem;
         }
 
@@ -94,6 +94,11 @@
             margin-bottom: 0.5rem;
             border-radius: 4px;
         }
+
+        .update-profile-form {
+            display: none; /* Hide the form initially */
+            margin-top: 1rem;
+        }
     </style>
 </head>
 <body>
@@ -101,7 +106,7 @@
         <h1>Vendor Dashboard</h1>
         <nav>
             <a href="/logout">Logout</a>
-            <a href="/customer">Dashboard</a>
+            
         </nav>
     </header>
     
@@ -122,20 +127,41 @@
             </form>
         </section>
 
-        <section class="products-section"></section>
-        <h2>Available Products</h2>
-        <ul id="productsList">
-            <% products.forEach(product => { %>
-                <li>
-                    <strong>Name:</strong> <%= product.itemName %>, 
-                    <strong>Quantity:</strong> <%= product.quantity %> kg, 
-                    <strong>Price per kg:</strong> $<%= product.pricePerKg.toFixed(2) %>
-                </li>
-            <% }) %>
-        </ul>
-    </section>
+        <section class="products-section">
+            <h2>Available Products</h2>
+            <ul id="productsList">
+                <% products.forEach(product => { %>
+                    <li>
+                        <strong>Name:</strong> <%= product.itemName %>, 
+                        <strong>Quantity:</strong> <%= product.quantity %> kg, 
+                        <strong>Price per kg:</strong> $<%= product.pricePerKg.toFixed(2) %>
+                    </li>
+                <% }) %>
+            </ul>
+        </section>
+
+        <section class="profile-section">
+            <h2>Profile</h2>
+            <button id="updateProfileBtn">Update Profile</button>
+            <div class="update-profile-form" id="updateProfileForm">
+                <form action="/vendor" method="POST">
+                    <label for="username">New Username (optional):</label>
+                    <input type="text" id="username" name="username" placeholder="Enter new username">
+
+                    <label for="password">New Password (optional):</label>
+                    <input type="password" id="password" name="password" placeholder="Enter new password">
+
+                    <button type="submit">Update Profile</button>
+                </form>
+            </div>
+        </section>
     </main>
 
-    <script src="js/vendor.js"></script>
+    <script>
+        document.getElementById('updateProfileBtn').addEventListener('click', function() {
+            const form = document.getElementById('updateProfileForm');
+            form.style.display = form.style.display === 'block' ? 'none' : 'block';
+        });
+    </script>
 </body>
 </html>
