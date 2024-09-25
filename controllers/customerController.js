@@ -203,7 +203,21 @@ exports.checkout = async (req, res) => {
                     success_url: `${req.protocol}://${req.get('host')}/customer/success`,
                     cancel_url: `${req.protocol}://${req.get('host')}/customer/cancel`,
                 });
-
+                 
+                // Handle Cash on Delivery (COD) payment method
+                const purchase = new Purchase({
+                    user: user._id,
+                    items: itemsToPurchase.map(cartItem => ({
+                        item: cartItem.item._id,
+                        name: cartItem.item.name,
+                        quantity: cartItem.quantity,
+                        pricePerKg: cartItem.item.pricePerKg // Include price
+                    })),
+                    purchaseDate: new Date(),
+                    status: 'received',
+                    totalAmount: finalAmount // Store the final amount in the purchase
+                });
+                await purchase.save();
                  // Update the stock and clear the cart after payment
                  for (const cartItem of itemsToPurchase) {
                     const item = await Item.findById(cartItem.item._id);
