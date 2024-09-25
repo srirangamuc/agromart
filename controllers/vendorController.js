@@ -55,19 +55,20 @@ async function addProduct(req, res) {
 // Function to fetch products for the vendor
 async function getProducts(req, res) {
     try {
-        const vendorId = req.session.userId;
+        const vendorId =  req.session.userId;
 
         if (!vendorId) {
             return res.status(400).send('Vendor must be logged in');
         }
 
         // Fetch products for the specific vendor
-        const products = await Vendor.find({ vendor: vendorId }).exec();
+        const products = await Vendor.find({ vendor: vendorId });
+        console.log(vendorId)
 
         // Filter products to ensure only those that match the vendor's userId are displayed
-        const filteredProducts = products.filter(product => product.vendor.toString() === vendorId);
-        console.log(filteredProducts);
-        res.render('vendor', { products: filteredProducts }); // Render vendor.ejs and pass filtered products
+        // const filteredProducts = products.filter(product => product.vendor.toString() === vendorId);
+        // console.log(filteredProducts);
+        res.render('vendor', {products}); // Render vendor.ejs and pass filtered products
     } catch (error) {
         console.error('Error fetching products:', error);
         res.status(500).send('Server error');

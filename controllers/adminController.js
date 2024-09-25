@@ -46,7 +46,6 @@ exports.updatePurchaseStatus = async (req, res) => {
 exports.getCustomerAnalysis = async (req, res) => {
     try {
         const proPlusCount = await User.countDocuments({ subscription: 'pro plus' });
-        console.log(proPlusCount)
         const proCount = await User.countDocuments({ subscription: 'pro' });
         const normalCount = await User.countDocuments({ subscription: 'normal' });
 

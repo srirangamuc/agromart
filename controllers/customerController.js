@@ -8,6 +8,42 @@ const stripe = require('stripe')(STRIPE_SECRET_KEY);
 // const dotenv = require('dotenv');
 // dotenv.config();
 
+
+// dotenv.config();
+const productImages = {
+    "Apple": "download-apples-png-image-red-apple-fruit-10.png",
+    "Banana": "fresh-yellow-banana-fruit-free-png.webp",
+    "Orange": "purepng.com-orange-orangesorangefruitbitter-orangeorangesclip-art-1701527337017aqfwq.png",
+    "Grapes": "grapes-isolated-on-transparent-background-grape-clip-art-generative-ai-png.webp",
+    "Strawberry": "purepng.com-strawberrystrawberrygenus-fragariastrawberriesfruitbotanical-berrybright-red-colorjuicy-texture-1701527399030cd1x5.png",
+    "Blueberry": "blueberry.gif",
+    "Watermelon": "watermelon.gif",
+    "Pineapple": "pinapple image.png",
+    "Mango": "Mango-PNG-Picture.png",
+    "Peach": "peach-png-transparent-picture-1.png",
+    "Plum": "plum.gif",
+    "Cherry": "cherry.png",
+    "Kiwi": "kiwi-fruit-transparent-background-free-png.webp",
+    "Lemon": "Fresh-lemon-with-leaves-isolated-on-transparent-background-PNG.png",
+    "Lime": "purepng.com-limelimelemonhybrid-citrus-fruitroundlime-greenpersian-lime-17015273304120hpww.png",
+    "Avocado": "OIP (1).jpeg",  // assuming a placeholder image
+    "Carrot": "purepng.com-carrotscarrotvegetablesfreshdeliciousefoodhealthycarrots-481521740717jmglq.png",
+    "Broccoli": "broccoli.webp",  // assuming a placeholder image
+    "Spinach": "spinach-transparent-background-png.webp",
+    "Kale": "kale.gif",
+    "Tomato": "tomato.jpg",  // assuming a placeholder image
+    "Cucumber": "isolated-cucumber-one-fresh-cucumber-isolated-transparent-background_542607-5441.jpg",
+    "Bell Pepper": "483-4832162_bell-pepper-png-photo-background-bell-pepper-png.png",
+    "Zucchini": "zucchini.png",
+    "Eggplant": "eggplant-background-6.png",
+    "Potato": "Potato-Transparent-Background.png",
+    "Sweet Potato": "sweet-potato-transparent-background-png.webp",
+    "Onion": "Onion-PNG-File.png",
+    "Garlic": "garlic.gif",
+    "Radish": "White-Radish-Transparent-Image.png",
+    "Beetroot": "beetroot-transparent-background-png.webp"
+};
+
 // Get customer dashboard
 exports.getCustomerDashBoard = async (req, res) => {
     try {
@@ -40,7 +76,7 @@ exports.getCustomerDashBoard = async (req, res) => {
             ...item,
             averagePrice: (item.total / item.count).toFixed(2) // Calculate average price
         }));
-        res.render('customer',{items:displayItems,user:userWithCart})
+        res.render('customer',{items:displayItems,user:userWithCart,productImages:productImages})
     } catch (error) {
         console.error("Error fetching customer dashboard:", error);
         res.status(500).send("Server error");
@@ -203,7 +239,37 @@ exports.checkout = async (req, res) => {
                     cancel_url: `${req.protocol}://${req.get('host')}/customer/cancel`, // Redirect on cancel
                 });
 
-                return res.redirect(303, session.url); // Redirect to Stripe checkout page
+                res.redirect(303, session.url); // Redirect to Stripe checkout page
+                const purchase = new Purchase({
+                    user: user._id,
+                    items: itemsToPurchase.map(cartItem => ({
+                        item: cartItem.item._id,
+                        name: cartItem.item.name,
+                        quantity: cartItem.quantity,
+                        pricePerKg: cartItem.item.pricePerKg // Include price
+                    })),
+                    purchaseDate: new Date(),
+                    status: 'received',
+                    totalAmount: finalAmount // Store the final amount in the purchase
+                });
+                await purchase.save();
+    
+                // Update item quantities and remove items with 0 quantity
+                for (const cartItem of itemsToPurchase) {
+                    const item = await Item.findById(cartItem.item._id);
+                    if (item) {
+                        item.quantity -= cartItem.quantity; // Reduce item quantity
+                        if (item.quantity <= 0) {
+                            await Item.findByIdAndDelete(item._id); // Delete item if quantity is 0
+                        } else {
+                            await item.save(); // Save updated item if not deleted
+                        }
+                    }
+                }
+    
+                // Clear the user's cart after purchase
+                user.cart = [];
+                await user.save();
 
             } catch (error) {
                 console.error("Stripe checkout error:", error);

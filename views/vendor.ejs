@@ -122,18 +122,18 @@
             </form>
         </section>
 
-        <section class="products-section">
-            <h2>Available Products</h2>
-            <ul id="productsList">
-                <% products.forEach(product => { %>
-                    <li>
-                        <strong>Name:</strong> <%= product.itemName %>, 
-                        <strong>Quantity:</strong> <%= product.quantity %> kg, 
-                        <strong>Price per kg:</strong> $<%= product.pricePerKg.toFixed(2) %>
-                    </li>
-                <% }) %>
-            </ul>
-        </section>
+        <section class="products-section"></section>
+        <h2>Available Products</h2>
+        <ul id="productsList">
+            <% products.forEach(product => { %>
+                <li>
+                    <strong>Name:</strong> <%= product.itemName %>, 
+                    <strong>Quantity:</strong> <%= product.quantity %> kg, 
+                    <strong>Price per kg:</strong> $<%= product.pricePerKg.toFixed(2) %>
+                </li>
+            <% }) %>
+        </ul>
+    </section>
     </main>
 
     <script src="js/vendor.js"></script>

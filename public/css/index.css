@@ -87,6 +87,11 @@ nav a {
     z-index: 10;
 }
 
+.shop-now-btn a{
+    text-decoration: none;
+    color:#fff
+}
+
 .hero-image {
     display: flex;
     align-items: center;

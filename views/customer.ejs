@@ -17,37 +17,53 @@
             color: #2e7d32;
         }
 
-        ul {
-            list-style-type: none;
-            padding: 0;
+        /* Grid layout for products */
+        .products-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
         }
 
-        ul li {
+        .product-item {
             background-color: white;
             border-radius: 8px;
-            margin-bottom: 15px;
             padding: 15px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            width: calc(25% - 20px); /* 4 items per row */
+            text-align: center;
         }
 
-        h3 {
-            margin: 0 0 10px 0;
+        img {
+            width: 100px;
+            height: 100px;
+        }
+
+        /* Styling for the cart table */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background-color: white;
+        }
+
+        th, td {
+            padding: 10px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .total-price {
+            font-size: 1.2em;
+            font-weight: bold;
             color: #2e7d32;
-        }
-
-        p {
-            margin: 5px 0;
-        }
-
-        form {
             margin-top: 10px;
         }
 
-        input[type="number"], input[type="radio"] {
-            padding: 5px;
-            font-size: 1em;
-        }
-
+        /* Button styling */
         button {
             background-color: #2e7d32;
             color: white;
@@ -61,17 +77,10 @@
             background-color: #1b5e20;
         }
 
-        .cart-section {
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-
         .delete-button {
             background-color: red;
             color: white;
-            padding: 10px 15px;
+            padding: 5px 10px;
             border: none;
             border-radius: 5px;
             cursor: pointer;
@@ -81,15 +90,7 @@
             background-color: darkred;
         }
 
-        .checkout-section {
-            background-color: white;
-            padding: 20px;
-            margin-top: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-
-        .profile-button {
+        .profile-button, .subscription-button {
             background-color: #2e7d32;
             color: white;
             padding: 10px 20px;
@@ -99,44 +100,8 @@
             display: inline-block;
         }
 
-        .profile-button:hover {
+        .profile-button:hover, .subscription-button:hover {
             background-color: #1b5e20;
-        }
-
-        .subscription-button {
-            background-color: #ff9800;
-            color: white;
-            padding: 10px 20px;
-            margin-top: 20px;
-            text-decoration: none;
-            border-radius: 5px;
-            display: inline-block;
-        }
-
-        .subscription-button:hover {
-            background-color: #e65100;
-        }
-
-        .subscription-section {
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            margin-top: 20px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-
-        .subscription-plan {
-            background-color: #fff3e0;
-            padding: 15px;
-            margin: 10px 0;
-            border-radius: 8px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-        }
-        .total-price {
-            font-size: 1.2em;
-            font-weight: bold;
-            color: #2e7d32;
-            margin-top: 10px;
         }
     </style>
 </head>
@@ -149,48 +114,62 @@
     <% } %>
 
     <h1>Available Products</h1>
-    <ul>
+    <div class="products-grid">
         <% items.forEach(item => { %>
-            <li>
+            <div class="product-item">
+                <img src="/images/transparent2/<%= productImages[item.name] %>" alt="<%= item.name %>">
                 <h3><%= item.name %></h3>
-                <p>Price: ₹<%= item.averagePrice*1.5 %></p>
+                <p>Price: ₹<%= item.averagePrice * 1.5 %></p>
                 <form action="/customer/add-to-cart" method="POST">
                     <input type="hidden" name="itemId" value="<%= item._id %>">
                     <input type="number" name="quantity" min="1" value="1" required>
                     <button type="submit">Add to Cart</button>
                 </form>
-            </li>
+            </div>
         <% }); %>
-    </ul>
+    </div>
 
     <h1>Your Cart</h1>
     <div class="cart-section">
-        <ul>
-            <% if (user.cart.length > 0) { %>
-                <% user.cart.forEach(cartItem => { %>
-                    <li>
-                        <% if (cartItem.item) { %>
-                            <h3><%= cartItem.item.name %></h3>
-                            <p>Quantity: <%= cartItem.quantity %></p>
-                            <p>Price: ₹<%= (cartItem.item.pricePerKg * cartItem.quantity*1.5).toFixed(2) %></p>
-                            <form action="/customer/delete-from-cart" method="POST">
-                                <input type="hidden" name="itemId" value="<%= cartItem.item._id %>">
-                                <button type="submit" class="delete-button">Delete</button>
-                            </form>
-                        <% } else { %>
-                            <p>Item not found.</p>
-                        <% } %>
-                    </li>
-                <% }); %>
-            <% } else { %>
-                <p>Your cart is empty.</p>
-            <% } %>
-        </ul>
+        <table>
+            <thead>
+                <tr>
+                    <th>Item Name</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% if (user.cart.length > 0) { %>
+                    <% user.cart.forEach(cartItem => { %>
+                        <tr>
+                            <% if (cartItem.item) { %>
+                                <td><%= cartItem.item.name %></td>
+                                <td><%= cartItem.quantity %></td>
+                                <td>₹<%= (cartItem.item.pricePerKg * cartItem.quantity * 1.5).toFixed(2) %></td>
+                                <td>
+                                    <form action="/customer/delete-from-cart" method="POST" style="display:inline;">
+                                        <input type="hidden" name="itemId" value="<%= cartItem.item._id %>">
+                                        <button type="submit" class="delete-button">Delete</button>
+                                    </form>
+                                </td>
+                            <% } else { %>
+                                <td colspan="4">Item not found.</td>
+                            <% } %>
+                        </tr>
+                    <% }); %>
+                <% } else { %>
+                    <tr>
+                        <td colspan="4">Your cart is empty.</td>
+                    </tr>
+                <% } %>
+            </tbody>
+        </table>
         <div class="total-price">
-            Total Price: ₹<span id="total-price"><%= user.cart.reduce((total, cartItem) => total + (cartItem.item.pricePerKg * cartItem.quantity*1.5), 0).toFixed(2) %></span>
+            Total Price: ₹<span id="total-price"><%= user.cart.reduce((total, cartItem) => total + (cartItem.item.pricePerKg * cartItem.quantity * 1.5), 0).toFixed(2) %></span>
         </div>
     </div>
-
 
     <% if (user.subscription !== 'pro plus') { %>
     <div class="subscription-section">

@@ -7,7 +7,7 @@ const isAuthenticated = require('../middleware/authMiddleware');
 router.post('/add-product', isAuthenticated, vendorController.addProduct);
 
 // Route to fetch products for the vendor
-router.get('/products', isAuthenticated, vendorController.getProducts);
+router.get('/', isAuthenticated, vendorController.getProducts);
 
 // Route to fetch the customer dashboard
 router.get('/', isAuthenticated, vendorController.getVendorDashboard);
