@@ -4,7 +4,97 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vendor Dashboard</title>
-    <link rel="stylesheet" href="css/vendor.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        header {
+            background-color: #333;
+            color: #fff;
+            padding: 1rem 0;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0;
+        }
+
+        nav {
+            margin: 1rem 0;
+        }
+
+        nav a {
+            color: #fff;
+            margin: 0 1rem;
+            text-decoration: none;
+        }
+
+        nav a:hover {
+            text-decoration: underline;
+        }
+
+        main {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .form-section, .products-section {
+            margin-bottom: 2rem;
+        }
+
+        h2 {
+            border-bottom: 2px solid #333;
+            padding-bottom: 0.5rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            width: 100%;
+            padding: 0.5rem;
+            margin-bottom: 1rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: #5cb85c;
+            color: #fff;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #4cae4c;
+        }
+
+        #productsList {
+            list-style-type: none;
+            padding: 0;
+        }
+
+        #productsList li {
+            background-color: #e9ecef;
+            padding: 1rem;
+            margin-bottom: 0.5rem;
+            border-radius: 4px;
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -32,14 +122,14 @@
             </form>
         </section>
 
-        <section class="products-section"></section>
+        <section class="products-section">
             <h2>Available Products</h2>
             <ul id="productsList">
                 <% products.forEach(product => { %>
                     <li>
-                        Name: <%= product.name %>, 
-                        Quantity: <%= product.quantity %> kg, 
-                        Price per kg: $<%= product.pricePerKg %>
+                        <strong>Name:</strong> <%= product.itemName %>, 
+                        <strong>Quantity:</strong> <%= product.quantity %> kg, 
+                        <strong>Price per kg:</strong> $<%= product.pricePerKg.toFixed(2) %>
                     </li>
                 <% }) %>
             </ul>

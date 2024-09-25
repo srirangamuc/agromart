@@ -2,12 +2,17 @@ const express = require("express");
 const bodyparser = require('body-parser');
 const mongoose = require("mongoose");
 const session = require('express-session');
+const bodyParser = require('body-parser')
+
 const authController = require('./controllers/authController');
 const dashboardController = require('./controllers/dashboardController');
-const vendorRoutes = require('./controllers/vendorController');
-const bodyParser = require('body-parser')
+
+
+const vendorRoutes = require('./routes/vendorRoutes');
 const customerRoutes = require('./routes/customerRoutes');
 const adminRoutes = require("./routes/adminRoutes")
+
+
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -44,9 +49,9 @@ app.post('/signup', authController.signup);
 app.get('/logout', authController.logout);
 
 // Dashboard routes
-app.get('/dashboard', dashboardController.getDashboard);
-app.get('/admin', dashboardController.getAdminDashboard);
-app.get('/vendor', dashboardController.getVendorDashboard);
+// app.get('/dashboard', dashboardController.getDashboard);
+// app.get('/admin', dashboardController.getAdminDashboard);
+// app.get('/vendor', dashboardController.getVendorDashboard);
 
 
 app.use('/vendor',vendorRoutes)
