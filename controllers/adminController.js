@@ -36,9 +36,24 @@ exports.updatePurchaseStatus = async (req, res) => {
         if (!purchase) {
             return res.status(404).send("Purchase not found");
         }
-        res.redirect('/admin/dashboard'); // Redirect to the admin dashboard after updating
+        res.redirect('/admin'); // Redirect to the admin dashboard after updating
     } catch (error) {
         console.error("Error updating purchase status:", error);
         res.status(500).send("Server error");
     }
+};
+
+exports.getCustomerAnalysis = async (req, res) => {
+    try {
+        const proPlusCount = await User.countDocuments({ subscription: 'pro plus' });
+        console.log(proPlusCount)
+        const proCount = await User.countDocuments({ subscription: 'pro' });
+        const normalCount = await User.countDocuments({ subscription: 'normal' });
+
+        // Return data as JSON for frontend usage
+        res.json({ proPlusCount, proCount, normalCount });
+    } catch (error) {
+        console.error('Error fetching customer analysis data:', error);
+        res.status(500).json({ message: 'Error fetching customer analysis data' });
+    }
 };

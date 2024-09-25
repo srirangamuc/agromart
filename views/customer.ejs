@@ -153,7 +153,7 @@
         <% items.forEach(item => { %>
             <li>
                 <h3><%= item.name %></h3>
-                <p>Price: ₹<%= item.averagePrice %></p>
+                <p>Price: ₹<%= item.averagePrice*1.5 %></p>
                 <form action="/customer/add-to-cart" method="POST">
                     <input type="hidden" name="itemId" value="<%= item._id %>">
                     <input type="number" name="quantity" min="1" value="1" required>
@@ -172,7 +172,7 @@
                         <% if (cartItem.item) { %>
                             <h3><%= cartItem.item.name %></h3>
                             <p>Quantity: <%= cartItem.quantity %></p>
-                            <p>Price: ₹<%= (cartItem.item.pricePerKg * cartItem.quantity).toFixed(2) %></p>
+                            <p>Price: ₹<%= (cartItem.item.pricePerKg * cartItem.quantity*1.5).toFixed(2) %></p>
                             <form action="/customer/delete-from-cart" method="POST">
                                 <input type="hidden" name="itemId" value="<%= cartItem.item._id %>">
                                 <button type="submit" class="delete-button">Delete</button>
@@ -187,7 +187,7 @@
             <% } %>
         </ul>
         <div class="total-price">
-            Total Price: ₹<span id="total-price"><%= user.cart.reduce((total, cartItem) => total + (cartItem.item.pricePerKg * cartItem.quantity), 0).toFixed(2) %></span>
+            Total Price: ₹<span id="total-price"><%= user.cart.reduce((total, cartItem) => total + (cartItem.item.pricePerKg * cartItem.quantity*1.5), 0).toFixed(2) %></span>
         </div>
     </div>
 
