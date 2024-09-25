@@ -8,5 +8,6 @@ router.get('/', adminController.getAdminDashboard);
 // Update purchase status route
 router.post('/update-purchase-status', adminController.updatePurchaseStatus);
 router.get('/customer-analysis', adminController.getCustomerAnalysis);
+router.get('/purchases-analysis', adminController.getPurchasesAnalysis); // New route
 
 module.exports = router;

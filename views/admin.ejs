@@ -91,6 +91,12 @@
         <div class="chart-container">
             <canvas id="customerPieChart" width="400" height="400"></canvas>
         </div>
+
+        <!-- Purchases Analysis Section -->
+        <h2>Purchases Analysis</h2>
+        <div class="chart-container">
+            <canvas id="purchasesBarChart" width="400" height="400"></canvas>
+        </div>
     </main>
 
     <!-- Chart.js Library -->
@@ -117,22 +123,53 @@
                     options: {
                         responsive: true,
                         plugins: {
-    datalabels: {
-        formatter: (value, ctx) => {
-            let sum = ctx.dataset.data.reduce((a, b) => a + b, 0);
-            let percentage = (value / sum * 100).toFixed(2) + "%";
-            return percentage;
-        },
-        color: '#fff',
-        font: {
-            weight: 'bold'
-        }
-    }
-}
+                            datalabels: {
+                                formatter: (value, ctx) => {
+                                    let sum = ctx.dataset.data.reduce((a, b) => a + b, 0);
+                                    let percentage = (value / sum * 100).toFixed(2) + "%";
+                                    return percentage;
+                                },
+                                color: '#fff',
+                                font: {
+                                    weight: 'bold'
+                                }
+                            }
+                        }
                     }
                 });
             })
             .catch(error => console.error('Error fetching customer data:', error));
+        
+        // Purchases Bar Chart Script
+        fetch('/admin/purchases-analysis')
+            .then(response => response.json())
+            .then(data => {
+                const { itemNames, quantities } = data;
+
+                const ctx = document.getElementById('purchasesBarChart').getContext('2d');
+                const purchasesBarChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: itemNames,
+                        datasets: [{
+                            label: 'Quantities Purchased',
+                            data: quantities,
+                            backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                            borderColor: 'rgba(75, 192, 192, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: {
+                                beginAtZero: true
+                            }
+                        }
+                    }
+                });
+            })
+            .catch(error => console.error('Error fetching purchases data:', error));
     </script>
 </body>
 </html>

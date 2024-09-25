@@ -57,3 +57,31 @@ exports.getCustomerAnalysis = async (req, res) => {
         res.status(500).json({ message: 'Error fetching customer analysis data' });
     }
 };
+
+exports.getPurchasesAnalysis = async (req, res) => {
+    try {
+        const purchases = await Purchase.find().populate('items.item');
+        const itemQuantities = {};
+
+        purchases.forEach(purchase => {
+            purchase.items.forEach(item => {
+                const itemName = item.name;
+                const quantity = item.quantity;
+
+                if (itemQuantities[itemName]) {
+                    itemQuantities[itemName] += quantity;
+                } else {
+                    itemQuantities[itemName] = quantity;
+                }
+            });
+        });
+
+        const itemNames = Object.keys(itemQuantities);
+        const quantities = Object.values(itemQuantities);
+
+        res.json({ itemNames, quantities });
+    } catch (error) {
+        console.error('Error fetching purchases analysis:', error);
+        res.status(500).send('Internal Server Error');
+    }
+};
