@@ -31,12 +31,12 @@ const userSchema = new mongoose.Schema({
         default: 'normal'
     },
     address: {
-        hno:{type:String,required:true},
-        street: { type: String, required: true },
-        city: { type: String, required: true },
-        state: { type: String, required: true },
-        country:{type:String,required:true},
-        zipCode: { type: String, required: true }
+        hno:{type:String,default : null},
+        street: { type: String, default : null },
+        city: { type: String, default : null },
+        state: { type: String, default : null },
+        country:{type:String, default : null},
+        zipCode: { type: String, default : null }
     }
 });
 

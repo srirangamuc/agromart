@@ -48,10 +48,10 @@ exports.login = async (req, res) => {
 
 // POST route for signup
 exports.signup = async (req, res) => {
-    const { name, email, password, role } = req.body;
+    const { name, email, password } = req.body;
 
     // Validate input
-    if (!name || !email || !password || !role) {
+    if (!name || !email || !password) {
         return res.status(400).send('All fields are required');
     }
 
@@ -61,12 +61,20 @@ exports.signup = async (req, res) => {
             return res.status(409).send('Email already exists'); // Conflict
         }
 
+        let role = 'customer'; // Default role
+
+        // Check if the email matches the admin format
+        const adminEmailRegex = /^admin\d+@freshmart\.com$/; // Adjust the regex as needed
+        if (adminEmailRegex.test(email)) {
+            role = 'admin'; // Assign admin role
+        }
+
         const hashedPassword = await bcrypt.hash(password, 10);
         const newUser = new User({
             name,
             email,
             password: hashedPassword,
-            role
+            role // Use the determined role
         });
 
         await newUser.save();
@@ -74,12 +82,18 @@ exports.signup = async (req, res) => {
         req.session.userRole = newUser.role; // Store user role
         req.session.userName = newUser.name; // Optionally store user's name
 
-        res.redirect('/customer'); // Redirect to customer dashboard
+        // Redirect based on role
+        if (role === 'admin') {
+            return res.redirect('/admin'); // Redirect to admin dashboard
+        } else {
+            return res.redirect('/customer'); // Redirect to customer dashboard
+        }
     } catch (error) {
         console.error("Signup error:", error);
         return res.status(500).send('Server error');
     }
 };
+
 
 // Logout route
 exports.logout = (req, res) => {

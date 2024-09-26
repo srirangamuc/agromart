@@ -42,6 +42,7 @@ emailInput.addEventListener('input', validateEmail);
 passwordInput.addEventListener('input', validatePassword);
 
 // Prevent form submission and validate on submit
+// Prevent form submission and validate on submit
 document.getElementById('signup-form').addEventListener('submit', function(event) {
     event.preventDefault(); // Prevent form submission
 
@@ -49,8 +50,20 @@ document.getElementById('signup-form').addEventListener('submit', function(event
     validateEmail();
     validatePassword();
 
-    // Check if there are any error messages
-    if (!emailError.innerText && !passwordError.innerText) {
-        this.submit(); // Submit the form if no errors
+    // Check if the email is in admin format
+    const email = emailInput.value;
+    const adminEmailRegex = /^admin\d+@freshmart\.com$/; // Adjust the regex as needed
+    const adminNotification = document.getElementById('admin-notification');
+
+    if (adminEmailRegex.test(email)) {
+        adminNotification.style.display = 'block'; // Show admin notification
+        // Proceed with the form submission
+        this.submit();
+    } else {
+        adminNotification.style.display = 'none'; // Hide admin notification
+        // Check if there are any error messages
+        if (!emailError.innerText && !passwordError.innerText) {
+            this.submit(); // Submit the form if no errors
+        }
     }
 });

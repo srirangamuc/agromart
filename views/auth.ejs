@@ -13,24 +13,25 @@
 
     <div class="container" id="container">
         <!-- Sign Up Form -->
-        <div class="form-container sign-up">
-            <form id="signup-form" action="/signup" method="POST">
-                <h1>Create Account</h1>
-                <span>Use your email for registration</span>
-                <input type="text" name="name" placeholder="Name" required>
-                <input type="email" name="email" id="signup-email" placeholder="Email" required>
-                <div id="email-error" class="error"></div>
-                <input type="password" name="password" id="signup-password" placeholder="Password" required>
-                <div id="password-error" class="error"></div>
-                <select name="role" required>
-                    <option value="" disabled selected>What are you?</option>
-                    <option value="admin">Admin</option>
-                    <option value="customer">Customer</option>
-                    <option value="vendor">Vendor</option>
-                </select>                
-                <button type="submit">Sign Up</button>
-            </form>
-        </div>
+        <!-- Sign Up Form -->
+<div class="form-container sign-up">
+    <form id="signup-form" action="/signup" method="POST">
+        <h1>Create Account</h1>
+        <span>Use your email for registration</span>
+        <input type="text" name="name" placeholder="Name" required>
+        <input type="email" name="email" id="signup-email" placeholder="Email" required>
+        <div id="email-error" class="error"></div>
+        <input type="password" name="password" id="signup-password" placeholder="Password" required>
+        <div id="password-error" class="error"></div>
+        <select name="role" id="role-select">
+            <option value="" disabled selected>What are you?</option>
+            <option value="customer">Customer</option>
+            <option value="vendor">Vendor</option>
+        </select>
+        <button type="submit">Sign Up</button>
+        <div id="admin-notification" class="error" style="display: none;">If you're an admin, please use the appropriate email format (e.g., admin<number>@freshmart.com).</div>
+    </form>
+</div>
 
         <!-- Sign In Form -->
         <div class="form-container sign-in">
