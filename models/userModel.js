@@ -29,6 +29,14 @@ const userSchema = new mongoose.Schema({
         type: String,
         enum: ['normal', 'pro', 'pro plus'],
         default: 'normal'
+    },
+    address: {
+        hno:{type:String,required:true},
+        street: { type: String, required: true },
+        city: { type: String, required: true },
+        state: { type: String, required: true },
+        country:{type:String,required:true},
+        zipCode: { type: String, required: true }
     }
 });
 

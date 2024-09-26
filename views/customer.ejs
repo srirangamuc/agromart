@@ -277,16 +277,36 @@
         <form action="/customer/update-profile" method="POST" class="update-profile-form">
             <label for="name">Name:</label>
             <input type="text" name="name" id="name" value="<%= user.name %>" required>
-
+    
             <label for="email">Email:</label>
             <input type="email" name="email" id="email" value="<%= user.email %>" required>
-
+    
             <label for="password">Password:</label>
             <input type="password" name="password" id="password" placeholder="Leave blank if not changing">
-
+    
+            <h3>Address</h3>
+            <label for="hno">House No:</label>
+            <input type="text" name="hno" id="hno" value="<%= user.address.hno || '' %>" required>
+    
+            <label for="street">Street:</label>
+            <input type="text" name="street" id="street" value="<%= user.address.street || '' %>" required>
+    
+            <label for="city">City:</label>
+            <input type="text" name="city" id="city" value="<%= user.address.city || '' %>" required>
+    
+            <label for="state">State:</label>
+            <input type="text" name="state" id="state" value="<%= user.address.state || '' %>" required>
+    
+            <label for="country">Country:</label>
+            <input type="text" name="country" id="country" value="<%= user.address.country || '' %>" required>
+    
+            <label for="zipCode">Zip Code:</label>
+            <input type="text" name="zipCode" id="zipCode" value="<%= user.address.zipCode || '' %>" required>
+    
             <button type="submit">Update Profile</button>
         </form>
     </div>
+    
 
     <script>
         // Function to show/hide sections based on the clicked button

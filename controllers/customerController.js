@@ -197,7 +197,8 @@ exports.checkout = async (req, res) => {
                 })),
                 purchaseDate: new Date(),
                 status: 'received',
-                totalAmount: finalAmount // Store the final amount in the purchase
+                totalAmount: finalAmount,
+                address: user.address // Store the final amount in the purchase
             });
             await purchase.save();
 
@@ -250,7 +251,8 @@ exports.checkout = async (req, res) => {
                     })),
                     purchaseDate: new Date(),
                     status: 'received',
-                    totalAmount: finalAmount // Store the final amount in the purchase
+                    totalAmount: finalAmount,
+                    address: user.address // Store the final amount in the purchase
                 });
                 await purchase.save();
     
@@ -323,7 +325,8 @@ exports.success = async (req, res) => {
             })),
             purchaseDate: new Date(),
             status: 'received',
-            totalAmount: finalAmount
+            totalAmount: finalAmount,
+            address: user.address
         });
         await purchase.save();
 
@@ -357,7 +360,7 @@ exports.cancel = (req, res) => {
 };
 
 
-// Update profile
+// Update profile 
 exports.updateProfile = async (req, res) => {
     try {
         const userId = req.session.userId;
@@ -365,22 +368,43 @@ exports.updateProfile = async (req, res) => {
             return res.status(401).send('User not authenticated');
         }
 
-        const { username, password } = req.body;
+        const { name, password, hno, street, city, state, zipCode, country } = req.body;
 
         const user = await User.findById(userId);
         if (!user) {
             return res.status(404).send('User not found');
         }
 
-        if (username) {
-            user.name = username;
+        // Update name
+        if (name) {
+            user.name = name;
         }
 
+        // Update password
         if (password) {
-            // Hash the new password before saving
             const saltRounds = 10;
             const hashedPassword = await bcrypt.hash(password, saltRounds);
             user.password = hashedPassword;
+        }
+
+        // Update address fields if provided
+        if (hno) {
+            user.address.hno = hno;
+        }
+        if (street) {
+            user.address.street = street;
+        }
+        if (city) {
+            user.address.city = city;
+        }
+        if (state) {
+            user.address.state = state;
+        }
+        if (zipCode) {
+            user.address.zipCode = zipCode;
+        }
+        if (country) {
+            user.address.country = country;
         }
 
         await user.save();
@@ -389,6 +413,16 @@ exports.updateProfile = async (req, res) => {
         console.error("Profile update error:", error);
         res.status(500).send("Server error");
     }
+};
+
+// Logout
+exports.logout = (req, res) => {
+    req.session.destroy(err => {
+        if (err) {
+            return res.status(500).send('Failed to logout');
+        }
+        res.redirect('/');
+    });
 };
 
 // Logout
