@@ -2,6 +2,19 @@
 
 Welcome to FreshMart! FreshMart is a comprehensive multivendor e-commerce platform designed for grocery shopping, where vendors can list their products, and customers can browse, purchase, and manage their orders seamlessly. This README provides an overview of the features and functionalities of the website.
 
+## Contributors:
+1. Srirangam Umesh Chandra (SPOC) (S20220010209):
+    -  Customer Dashboard, Checkout and Cart Logic
+2. Surapuchetty Abhilash (S20220010216):
+    - Customer Dashboard, Checkout and Cart Logic
+	- Profile Updation Feature
+3. Somanaboina Nandish (S20220010205):
+    - Vendor Dashboard functionalities
+4. Satya Sai Ramesh Panchakarla (S20220010162):
+    - Admin Dashboard functionalities
+5. Sonohar Boggavarapu (S20220010041):
+    - Authentication and Authorization
+
 ## Features
 
 ### For Customers:
@@ -40,9 +53,6 @@ Welcome to FreshMart! FreshMart is a comprehensive multivendor e-commerce platfo
 4. Set up the database and environment variables.
 5. Start the server: `npm start`
 6. Open your browser and go to `http://localhost:5000`.
-
-## Contributing
-We welcome contributions to improve FreshMart! Please fork the repository, create a new branch, and submit a pull request with your changes.
 
 ## License
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
