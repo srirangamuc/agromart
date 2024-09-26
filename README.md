@@ -35,12 +35,12 @@ Welcome to FreshMart! FreshMart is a comprehensive multivendor e-commerce platfo
 - **Charting Library**: Chart.js for profit visualization
 
 ## Getting Started
-1. Clone the repository: `git clone https://github.com/yourusername/freshmart.git`
+1. Clone the repository: `git clone https://github.com/srirangamuc/freshmart.git`
 2. Navigate to the project directory: `cd freshmart`
 3. Install dependencies: `npm install`
 4. Set up the database and environment variables.
 5. Start the server: `npm start`
-6. Open your browser and go to `http://localhost:3000`.
+6. Open your browser and go to `http://localhost:5000`.
 
 ## Contributing
 We welcome contributions to improve FreshMart! Please fork the repository, create a new branch, and submit a pull request with your changes.
