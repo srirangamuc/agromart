@@ -152,6 +152,13 @@
             border: 1px solid #ddd;
             border-radius: 5px;
         }
+        .error-message {
+            color: red;
+            background-color: #fdd;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
@@ -161,6 +168,8 @@
     <% } else if (user.subscription === 'pro plus') { %>
         <h2>You are a Pro Plus User!</h2>
     <% } %>
+    <div id="error-message" style="color: red;"></div>
+
 
     <div class="nav">
         <button onclick="showSection('products')">Available Products</button>
@@ -177,7 +186,7 @@
         <div class="products-grid">
             <% items.forEach(item => { %>
                 <div class="product-item">
-                    <img src="/images/transparent2/<%= productImages[item.name] %>" alt="<%= item.name %>">
+                    <img src="/images/resized_images/<%= item.name %>.png" alt="<%= item.name %>">
                     <h3><%= item.name %></h3>
                     <p>Price: ₹<%= item.averagePrice * 1.5 %></p>
                     <form action="/customer/add-to-cart" method="POST">
@@ -316,6 +325,16 @@
                 section.classList.remove('active'); // Hide all sections
             });
             document.getElementById(sectionId).classList.add('active'); // Show the clicked section
+        }
+        function getQueryParams(param) {
+            let params = new URLSearchParams(window.location.search);
+            return params.get(param);
+        }
+        // Get the 'error' query from the URL
+        const error = getQueryParams('error');
+        // If an error is present, display it in a message div
+        if (error) {
+            document.getElementById('error-message').innerText = decodeURIComponent(error);
         }
     </script>
 </body>

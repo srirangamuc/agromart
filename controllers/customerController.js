@@ -78,8 +78,8 @@ exports.getCustomerDashBoard = async (req, res) => {
         }));
         res.render('customer',{items:displayItems,user:userWithCart,productImages:productImages})
     } catch (error) {
-        console.error("Error fetching customer dashboard:", error);
-        res.status(500).send("Server error");
+        console.error("Checkout error:", error);
+        return res.redirect('/customer?error=Something went wrong during checkout. Please try again.');
     }
 };
 // Add item to cart
@@ -112,8 +112,8 @@ exports.addToCart = async (req, res) => {
         await user.save();
         res.redirect('/customer');
     } catch (error) {
-        console.error('Error in addToCart:', error);
-        res.status(500).send('Server error');
+        console.error("Checkout error:", error);
+        return res.redirect('/customer?error=Something went wrong during checkout. Please try again.');
     }
 };
 
@@ -140,8 +140,8 @@ exports.deleteFromCart = async (req, res) => {
         await user.save();
         res.redirect('/customer');
     } catch (error) {
-        console.error('Error in deleteFromCart:', error);
-        res.status(500).send('Server error');
+        console.error("Checkout error:", error);
+        return res.redirect('/customer?error=Something went wrong during checkout. Please try again.');
     }
 };
 
@@ -150,7 +150,6 @@ exports.checkout = async (req, res) => {
 
     try {
         const user = await User.findById(req.session.userId).populate('cart.item');
-
         if (!user) {
             return res.status(400).send("User not found.");
         }
@@ -184,6 +183,10 @@ exports.checkout = async (req, res) => {
         }
 
         const finalAmount = totalAmount - discount;
+
+        if (!user.address || !user.address.hno || !user.address.street || !user.address.city || !user.address.state || !user.address.country || !user.address.zipCode) {
+            return res.redirect('/customer?error=Please fill in all the required address fields before checkout.');
+        }
 
         if (paymentMethod === 'COD') {
             // Handle Cash on Delivery (COD) payment method
@@ -274,13 +277,13 @@ exports.checkout = async (req, res) => {
                 await user.save();
 
             } catch (error) {
-                console.error("Stripe checkout error:", error);
-                return res.status(500).send("Payment error");
+                console.error("Checkout error:", error);
+                return res.redirect('/customer?error=Something went wrong during checkout. Please try again.');
             }
         }
     } catch (error) {
         console.error("Checkout error:", error);
-        return res.status(500).send("Server error");
+        return res.redirect('/customer?error=Something went wrong during checkout. Please try again.');
     }
 };
 
@@ -349,8 +352,8 @@ exports.success = async (req, res) => {
 
         return res.redirect('/customer/purchases'); // Redirect to purchases page after success
     } catch (error) {
-        console.error("Payment success error:", error);
-        return res.status(500).send("Server error");
+        console.error("Checkout error:", error);
+        return res.redirect('/customer?error=Something went wrong during checkout. Please try again.');
     }
 };
 
@@ -410,8 +413,8 @@ exports.updateProfile = async (req, res) => {
         await user.save();
         res.redirect('/customer');
     } catch (error) {
-        console.error("Profile update error:", error);
-        res.status(500).send("Server error");
+        console.error("Checkout error:", error);
+        return res.redirect('/customer?error=Something went wrong. Please try again.');
     }
 };
 
@@ -448,8 +451,8 @@ exports.getPurchases = async (req, res) => {
 
         res.render('purchases', { purchases }); // Render a purchases EJS template
     } catch (error) {
-        console.error("Error fetching purchases:", error);
-        res.status(500).send("Server error");
+        console.error("Purchases error:", error);
+        return res.redirect('/customer?error=Something went wrong. Please try again.');
     }
 };
 exports.getSucess = (req, res) => {
@@ -499,8 +502,8 @@ exports.purchaseSubscription = async (req, res) => {
 
         res.redirect(303, session.url);
     } catch (error) {
-        console.error('Stripe subscription error:', error);
-        res.status(500).send('Server error');
+        console.error("Checkout error:", error);
+        return res.redirect('/customer?error=Something went wrong during checkout. Please try again.');
     }
 };
 
@@ -521,8 +524,8 @@ exports.successSubscription = async (req, res) => {
 
         res.redirect('/customer');
     } catch (error) {
-        console.error('Subscription success error:', error);
-        res.status(500).send('Server error');
+        console.error("Checkout error:", error);
+        return res.redirect('/customer?error=Something went wrong during checkout. Please try again.');
     }
 };
 exports.cancelPayment = (req, res) => {
