@@ -7,7 +7,6 @@ Welcome to FreshMart! FreshMart is a comprehensive multivendor e-commerce platfo
 ### For Customers:
 - **User Authentication**: Secure signup and login functionality for customers.
 - **Customer Dashboard**: A personalized dashboard where customers can view available products, manage their cart, and access their profile.
-- **Product Browsing**: Easy navigation through a variety of grocery products offered by different vendors.
 - **Cart Management**: Add, update, or remove items from the cart with a dynamic total price display.
 - **Checkout Process**: Simple checkout process with payment integration (via Stripe).
 - **Subscription Plans**: Customers can choose between different subscription plans (normal, pro, pro plus) to receive discounts on their purchases.

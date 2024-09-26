@@ -5,17 +5,19 @@ const Vendor = require('../models/vendorModel');
 const isAuthenticated = require('../middleware/authMiddleware');
 
 // Route to add a product
-router.post('/add-product', isAuthenticated, vendorController.addProduct);
+router.post('/add-product', isAuthenticated, (req, res) => vendorController.addProduct(req, res));
 
 // Route to fetch products for the vendor
-router.get('/products', isAuthenticated, vendorController.getProducts);
+router.get('/products', isAuthenticated, (req, res) => vendorController.getProducts(req, res));
 
 // Route to fetch the vendor dashboard
-router.get('/dashboard', isAuthenticated, vendorController.getVendorDashboard);
+router.get('/dashboard', isAuthenticated, (req, res) => vendorController.getVendorDashboard(req, res));
 
 // Route to render the vendor page (including the profile section)
-router.get('/', isAuthenticated, vendorController.getVendorDashboard); // Ensure this function is defined
-router.post('/', isAuthenticated, vendorController.updateProfile); // Add this line to handle profile updates
+router.get('/', isAuthenticated, (req, res) => vendorController.getVendorDashboard(req, res));
+router.post('/', isAuthenticated, (req, res) => vendorController.updateProfile(req, res)); // Handle profile updates
+
+// Route to fetch profit data
 router.get('/profit-data', isAuthenticated, async (req, res) => {
     try {
         const vendorId = req.session.userId;
@@ -48,6 +50,5 @@ router.get('/profit-data', isAuthenticated, async (req, res) => {
         res.status(500).json({ error: 'Server error' });
     }
 });
-
 
 module.exports = router;

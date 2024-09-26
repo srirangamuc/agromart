@@ -1,107 +1,111 @@
 const bcrypt = require('bcrypt');
 const User = require('../models/userModel');
 
-// Render login and signup pages
-exports.renderAuth = (req, res) => {
-    res.render('auth');
-};
-
-// POST route for login
-exports.login = async (req, res) => {
-    const { email, password } = req.body;
-
-    // Validate input
-    if (!email || !password) {
-        return res.status(400).send('Email and password are required');
+class AuthController {
+    // Render login and signup pages
+    renderAuth(req, res) {
+        res.render('auth');
     }
 
-    try {
-        const user = await User.findOne({ email });
+    // POST route for login
+    async login(req, res) {
+        const { email, password } = req.body;
 
-        if (!user) {
-            return res.redirect('/signup'); // Redirect to signup if user not found
+        // Validate input
+        if (!email || !password) {
+            return res.status(400).send('Email and password are required');
         }
 
-        const match = await bcrypt.compare(password, user.password);
-        if (match) {
-            // Store user information in the session
-            req.session.userId = user._id.toString();
-            req.session.userRole = user.role;
-            req.session.userName = user.name; // Optionally store user's name
+        try {
+            const user = await User.findOne({ email });
 
-            // Redirect based on user role
-            if (user.role === 'admin') {
-                return res.redirect('/admin'); // Admin dashboard route
-            } else if (user.role === 'vendor') {
-                return res.redirect('/vendor'); // Vendor dashboard route
-            } else {
-                return res.redirect('/customer'); // Customer dashboard route
+            if (!user) {
+                return res.redirect('/signup'); // Redirect to signup if user not found
             }
-        } else {
-            return res.status(401).send('Invalid email or password'); // Unauthorized
-        }
-    } catch (error) {
-        console.error("Login error:", error);
-        return res.status(500).send('Server error');
-    }
-};
 
-// POST route for signup
-exports.signup = async (req, res) => {
-    const { name, email, password } = req.body;
+            const match = await bcrypt.compare(password, user.password);
+            if (match) {
+                // Store user information in the session
+                req.session.userId = user._id.toString();
+                req.session.userRole = user.role;
+                req.session.userName = user.name; // Optionally store user's name
 
-    // Validate input
-    if (!name || !email || !password) {
-        return res.status(400).send('All fields are required');
-    }
-
-    try {
-        const existingUser = await User.findOne({ email });
-        if (existingUser) {
-            return res.status(409).send('Email already exists'); // Conflict
-        }
-
-        let role = 'customer'; // Default role
-
-        // Check if the email matches the admin format
-        const adminEmailRegex = /^admin\d+@freshmart\.com$/; // Adjust the regex as needed
-        if (adminEmailRegex.test(email)) {
-            role = 'admin'; // Assign admin role
-        }
-
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const newUser = new User({
-            name,
-            email,
-            password: hashedPassword,
-            role // Use the determined role
-        });
-
-        await newUser.save();
-        req.session.userId = newUser._id.toString(); // Store user ID in session
-        req.session.userRole = newUser.role; // Store user role
-        req.session.userName = newUser.name; // Optionally store user's name
-
-        // Redirect based on role
-        if (role === 'admin') {
-            return res.redirect('/admin'); // Redirect to admin dashboard
-        } else {
-            return res.redirect('/customer'); // Redirect to customer dashboard
-        }
-    } catch (error) {
-        console.error("Signup error:", error);
-        return res.status(500).send('Server error');
-    }
-};
-
-
-// Logout route
-exports.logout = (req, res) => {
-    req.session.destroy((err) => {
-        if (err) {
-            console.error("Logout error:", err);
+                // Redirect based on user role
+                if (user.role === 'admin') {
+                    return res.redirect('/admin'); // Admin dashboard route
+                } else if (user.role === 'vendor') {
+                    return res.redirect('/vendor'); // Vendor dashboard route
+                } else {
+                    return res.redirect('/customer'); // Customer dashboard route
+                }
+            } else {
+                return res.status(401).send('Invalid email or password'); // Unauthorized
+            }
+        } catch (error) {
+            console.error("Login error:", error);
             return res.status(500).send('Server error');
         }
-        res.redirect('/'); // Redirect to home after logout
-    });
-};
+    }
+
+    // POST route for signup
+    async signup(req, res) {
+        const { name, email, password } = req.body;
+
+        // Validate input
+        if (!name || !email || !password) {
+            return res.status(400).send('All fields are required');
+        }
+
+        try {
+            const existingUser = await User.findOne({ email });
+            if (existingUser) {
+                return res.status(409).send('Email already exists'); // Conflict
+            }
+
+            let role = 'customer'; // Default role
+
+            // Check if the email matches the admin format
+            const adminEmailRegex = /^admin\d+@freshmart\.com$/; // Adjust the regex as needed
+            if (adminEmailRegex.test(email)) {
+                role = 'admin'; // Assign admin role
+            }
+
+            const hashedPassword = await bcrypt.hash(password, 10);
+            const newUser = new User({
+                name,
+                email,
+                password: hashedPassword,
+                role // Use the determined role
+            });
+
+            await newUser.save();
+            req.session.userId = newUser._id.toString(); // Store user ID in session
+            req.session.userRole = newUser.role; // Store user role
+            req.session.userName = newUser.name; // Optionally store user's name
+
+            // Redirect based on role
+            if (role === 'admin') {
+                return res.redirect('/admin'); // Redirect to admin dashboard
+            } else {
+                return res.redirect('/customer'); // Redirect to customer dashboard
+            }
+        } catch (error) {
+            console.error("Signup error:", error);
+            return res.status(500).send('Server error');
+        }
+    }
+
+    // Logout route
+    logout(req, res) {
+        req.session.destroy((err) => {
+            if (err) {
+                console.error("Logout error:", err);
+                return res.status(500).send('Server error');
+            }
+            res.redirect('/'); // Redirect to home after logout
+        });
+    }
+}
+
+// Export an instance of AuthController
+module.exports = new AuthController();

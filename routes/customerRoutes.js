@@ -1,37 +1,40 @@
 const express = require('express');
 const router = express.Router();
-const customerController = require('../controllers/customerController');
+const customerController = require('../controllers/customerController'); // Assuming CustomerController is the class
+
+
+
 
 // Customer dashboard
-router.get('/', customerController.getCustomerDashBoard);
+router.get('/', (req, res) => customerController.getCustomerDashBoard(req, res));
 
 // Add item to cart
-router.post('/add-to-cart', customerController.addToCart);
+router.post('/add-to-cart', (req, res) => customerController.addToCart(req, res));
 
-// Add route to delete an item from the cart
-router.post('/delete-from-cart', customerController.deleteFromCart);
+// Delete an item from the cart
+router.post('/delete-from-cart', (req, res) => customerController.deleteFromCart(req, res));
 
 // Checkout
-router.post('/checkout', customerController.checkout);
+router.post('/checkout', (req, res) => customerController.checkout(req, res));
 
 // Update profile
-router.post('/update-profile', customerController.updateProfile);
+router.post('/update-profile', (req, res) => customerController.updateProfile(req, res));
 
 // Purchases
-router.get('/purchases', customerController.getPurchases);
+router.get('/purchases', (req, res) => customerController.getPurchases(req, res));
 
 // Subscription
-router.post('/subscribe', customerController.purchaseSubscription);
-router.get('/success-subscription', customerController.successSubscription);
+router.post('/subscribe', (req, res) => customerController.purchaseSubscription(req, res));
+router.get('/success-subscription', (req, res) => customerController.successSubscription(req, res));
 
 // Payment Cancellation
-router.get('/cancel', customerController.cancelPayment);
+router.get('/cancel', (req, res) => customerController.cancelPayment(req, res));
 
 // Success and Failure Pages
-router.get('/success', customerController.getSucess);
-router.get('/failure', customerController.getFaliure);
+router.get('/success', (req, res) => customerController.getSucess(req, res));
+router.get('/failure', (req, res) => customerController.getFaliure(req, res));
 
 // Logout
-router.post('/logout', customerController.logout);
+router.post('/logout', (req, res) => customerController.logout(req, res));
 
 module.exports = router;
