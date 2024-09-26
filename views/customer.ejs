@@ -91,18 +91,21 @@
             margin-top: 10px;
         }
 
-        /* Button styling */
-        button {
-            background-color: #2e7d32;
-            color: white;
-            padding: 10px 15px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
+        .button {
+            background-color: #2e7d32; /* Main color */
+            color: white; /* Text color */
+            padding: 10px 15px; /* Padding */
+            border: none; /* Remove border */
+            border-radius: 5px; /* Rounded corners */
+            cursor: pointer; /* Pointer on hover */
+            text-decoration: none; /* Remove underline */
+            margin-right: 10px; /* Space between buttons */
+            display: inline-block; /* Display as inline block */
+            transition: background-color 0.3s; /* Smooth background color transition */
         }
-
-        button:hover {
-            background-color: #1b5e20;
+        
+        .button:hover {
+            background-color: #1b5e20; /* Darker shade on hover */
         }
 
         .delete-button {
@@ -176,6 +179,7 @@
         <button onclick="showSection('cart-checkout')">Your Cart & Checkout</button>
         <button onclick="showSection('subscription')">Subscription Options</button>
         <button onclick="showSection('update-profile')">Update Profile</button>
+        <button onclick="showSection('get-purchases')">Get Previous Purchases</button>
         <form action="/customer/logout" method="POST" style="display:inline;">
             <button type="submit" class="profile-button">Logout</button>
         </form>
@@ -250,7 +254,7 @@
             <label>
                 <input type="radio" name="paymentMethod" value="stripe"> Stripe
             </label>
-            <button type="submit">Proceed to Checkout</button>
+            <button type="submit">Checkout</button>
         </form>
     </div>
 
@@ -315,6 +319,24 @@
             <button type="submit">Update Profile</button>
         </form>
     </div>
+    <div id="get-purchases" class="section">
+        <h1>Your Purchases</h1>
+        <table id="purchasesTable" style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr>
+                    <th>Purchase Date</th>
+                    <th>Item Name</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="purchasesBody">
+                <!-- Purchases will be populated here -->
+            </tbody>
+        </table>
+        <a href="/customer">Back to Dashboard</a>
+    </div>
     
 
     <script>
@@ -336,6 +358,48 @@
         if (error) {
             document.getElementById('error-message').innerText = decodeURIComponent(error);
         }
+
+
+
+        function fetchPurchases() {
+            fetch('/customer/purchases')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    const purchasesBody = document.getElementById('purchasesBody');
+                    purchasesBody.innerHTML = ''; // Clear existing rows
+    
+                    // Populate the table with purchases data
+                    data.forEach(purchase => {
+                        const row = document.createElement('tr');
+                        const purchaseDate = new Date(purchase.purchaseDate).toDateString();
+    
+                        // Add purchase items
+                        purchase.items.forEach(item => {
+                            const itemRow = document.createElement('tr');
+                            itemRow.innerHTML = `
+                                <td>${purchaseDate}</td>
+                                <td>${item.name}</td>
+                                <td>${item.quantity}</td>
+                                <td>₹${purchase.totalAmount}</td>
+                                <td>${purchase.status}</td>
+                            `;
+                            purchasesBody.appendChild(itemRow);
+                        });
+                    });
+                })
+                .catch(error => console.error('Error fetching purchases:', error));
+        }
+    
+        // Show purchases section and fetch data
+        document.querySelector('.nav button:nth-child(5)').addEventListener('click', function() {
+            showSection('get-purchases'); // Show the purchases section
+            fetchPurchases(); // Fetch the purchases data
+        });
     </script>
 </body>
 </html>

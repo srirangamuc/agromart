@@ -444,15 +444,16 @@ exports.getPurchases = async (req, res) => {
         const userId = req.session.userId;
 
         if (!userId) {
-            return res.status(401).send('User not authenticated');
+            return res.status(401).json({ message: 'User not authenticated' });
         }
 
         const purchases = await Purchase.find({ user: userId });
 
-        res.render('purchases', { purchases }); // Render a purchases EJS template
+        // Return JSON response
+        res.json(purchases);
     } catch (error) {
         console.error("Purchases error:", error);
-        return res.redirect('/customer?error=Something went wrong. Please try again.');
+        return res.status(500).json({ message: 'Something went wrong. Please try again.' });
     }
 };
 exports.getSucess = (req, res) => {
