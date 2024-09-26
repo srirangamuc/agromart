@@ -5,7 +5,7 @@ const session = require('express-session');
 const bodyParser = require('body-parser')
 
 const authController = require('./controllers/authController');
-const dashboardController = require('./controllers/dashboardController');
+
 
 
 const vendorRoutes = require('./routes/vendorRoutes');

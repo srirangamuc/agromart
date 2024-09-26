@@ -9,6 +9,7 @@ const stripe = require('stripe')(STRIPE_SECRET_KEY);
 // dotenv.config();
 
 class CustomerController{
+    //Get Customer Dashboard
     async getCustomerDashBoard(req,res){
         try {
             const userId = req.session.userId;
@@ -244,76 +245,8 @@ class CustomerController{
         return res.redirect('/customer?error=Something went wrong during checkout. Please try again.');
     }
     }
-    async success(req,res){
-        try {
-            const user = await User.findById(req.session.userId).populate('cart.item');
-    
-            if (!user) {
-                return res.status(400).send("User not found.");
-            }
-    
-            const itemsToPurchase = user.cart.filter(cartItem => cartItem.item);
-    
-            if (itemsToPurchase.length === 0) {
-                return res.status(400).send("Your cart is empty or contains invalid items.");
-            }
-    
-            // Calculate the total amount
-            const totalAmount = itemsToPurchase.reduce((total, cartItem) => {
-                return total + (cartItem.item.pricePerKg * cartItem.quantity * 1.5);
-            }, 0);
-    
-            // Apply discounts based on the user's subscription
-            let discount = 0;
-            if (user.subscription === 'pro') {
-                discount = totalAmount * 0.10; // 10% discount
-            } else if (user.subscription === 'pro plus') {
-                discount = totalAmount * 0.20; // 20% discount
-            }
-    
-            const finalAmount = totalAmount - discount;
-    
-            // Save the purchase only after payment is confirmed
-            const purchase = new Purchase({
-                user: user._id,
-                items: itemsToPurchase.map(cartItem => ({
-                    item: cartItem.item._id,
-                    name: cartItem.item.name,
-                    quantity: cartItem.quantity,
-                    pricePerKg: cartItem.item.pricePerKg // Include price
-                })),
-                purchaseDate: new Date(),
-                status: 'received',
-                totalAmount: finalAmount,
-                address: user.address
-            });
-            await purchase.save();
-    
-            // Update stock after successful payment
-            for (const cartItem of itemsToPurchase) {
-                const item = await Item.findById(cartItem.item._id);
-                if (item) {
-                    item.quantity -= cartItem.quantity; // Reduce item quantity
-                    if (item.quantity <= 0) {
-                        await Item.findByIdAndDelete(item._id); // Delete item if quantity is 0
-                    } else {
-                        await item.save(); // Save updated item if not deleted
-                    }
-                }
-            }
-    
-            // Clear the user's cart after successful purchase
-            user.cart = [];
-            await user.save();
-    
-            return res.redirect('/customer/purchases'); // Redirect to purchases page after success
-        } catch (error) {
-            console.error("Checkout error:", error);
-            return res.redirect('/customer?error=Something went wrong during checkout. Please try again.');
-        }
-    }
     async cancel(req,res){
-        return res.redirect('/customer/cart');
+        return res.redirect('/customer');
     }
     async updateProfile(req,res){
         try {

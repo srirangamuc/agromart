@@ -7,7 +7,7 @@ class AdminController {
         try {
             // Fetch purchases
             const purchases = await Purchase.find().populate('user').exec();
-            
+             
             // Fetch customers grouped by subscription
             const proPlusCustomers = await User.find({ role: 'customer', subscription: 'pro plus' }).sort({ createdAt: -1 });
             const proCustomers = await User.find({ role: 'customer', subscription: 'pro' }).sort({ createdAt: -1 });
