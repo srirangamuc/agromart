@@ -24,8 +24,22 @@ router.get('/profit-data', isAuthenticated, async (req, res) => {
         const products = await Vendor.find({ vendor: vendorId });
 
         // Prepare data for the profit chart
-        const productNames = products.map(product => product.itemName);
-        const profits = products.map(product => product.profit);
+        const profitDataMap = new Map(); // Use a Map to keep track of product profits
+
+        products.forEach(product => {
+            if (profitDataMap.has(product.itemName)) {
+                // Update profit if product already exists
+                const existingProfit = profitDataMap.get(product.itemName);
+                profitDataMap.set(product.itemName, existingProfit + product.profit);
+            } else {
+                // Add new product to the Map
+                profitDataMap.set(product.itemName, product.profit);
+            }
+        });
+
+        // Convert the Map to arrays for response
+        const productNames = Array.from(profitDataMap.keys());
+        const profits = Array.from(profitDataMap.values());
 
         // Send the data as JSON response
         res.json({ productNames, profits });
@@ -34,5 +48,6 @@ router.get('/profit-data', isAuthenticated, async (req, res) => {
         res.status(500).json({ error: 'Server error' });
     }
 });
+
 
 module.exports = router;
