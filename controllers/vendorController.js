@@ -78,6 +78,7 @@ async function getProducts(req, res) {
 
 // Function to fetch the customer dashboard
 // Function to fetch the vendor dashboard
+// Function to fetch the vendor dashboard
 async function getVendorDashboard(req, res) {
     try {
         const vendorId = req.session.userId;
@@ -88,12 +89,19 @@ async function getVendorDashboard(req, res) {
         // Fetch vendor profile
         const vendorProfile = await User.findById(vendorId);
 
-        res.render('vendor', { products, vendorProfile }); // Pass the vendor profile data to the template
+        // Prepare data for the profit chart
+        const productNames = products.map(product => product.itemName);
+        const profits = products.map(product => product.profit);
+
+        // Pass the products, vendorProfile, and chart data (productNames, profits) to the view
+        res.render('vendor', { products, vendorProfile, productNames, profits });
     } catch (error) {
         console.error('Error fetching vendor dashboard:', error);
         res.status(500).send('Server error');
     }
 }
+
+
 
 
 // Update profile

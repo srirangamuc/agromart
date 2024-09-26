@@ -113,55 +113,103 @@
     <main>
         <section class="form-section">
             <h2>Add New Product</h2>
-            <form id="addProductForm" action="/vendor/add-product" method="POST">
-                <label for="name">Product Name:</label>
-                <input type="text" id="name" name="name" required>
+        <form id="addProductForm" action="/vendor/add-product" method="POST">
+            <label for="name">Product Name:</label>
+            <input type="text" id="name" name="name" required>
 
-                <label for="quantity">Quantity (kg):</label>
-                <input type="number" id="quantity" name="quantity" required>
+            <label for="quantity">Quantity (kg):</label>
+            <input type="number" id="quantity" name="quantity" required>
 
-                <label for="pricePerKg">Price per kg:</label>
-                <input type="number" id="pricePerKg" name="pricePerKg" step="0.01" required>
+            <label for="pricePerKg">Price per kg:</label>
+            <input type="number" id="pricePerKg" name="pricePerKg" step="0.01" required>
 
-                <button type="submit">Add Product</button>
+            <button type="submit">Add Product</button>
+        </form>
+
+        <!-- Products Sold Section -->
+        <h2>Products Sold</h2>
+        <ul id="productsList">
+            <% products.forEach(product => { %>
+                <li>
+                    <strong>Name:</strong> <%= product.itemName %>, 
+                    <strong>Quantity:</strong> <%= product.quantity %> kg, 
+                    <strong>Price per kg:</strong> $<%= product.pricePerKg.toFixed(2) %>, 
+                    <strong>Profit:</strong> $<%= product.profit.toFixed(2) %>
+                </li>
+            <% }) %>
+        </ul>
+
+        <!-- Profit Analysis Section -->
+        <h2>Profit Analysis</h2>
+        <div class="chart-container">
+            <canvas id="profitChart" width="400" height="400"></canvas>
+        </div>
+
+        <!-- Profile Update Section -->
+        <h2>Update Profile</h2>
+        <button id="updateProfileBtn">Update Profile</button>
+        <div class="update-profile-form" id="updateProfileForm" style="display: none;">
+            <form action="/vendor" method="POST">
+                <label for="username">New Username (optional):</label>
+                <input type="text" id="username" name="username" placeholder="Enter new username">
+                <label for="password">New Password (optional):</label>
+                <input type="password" id="password" name="password" placeholder="Enter new password">
+                <button type="submit">Update Profile</button>
             </form>
-        </section>
-
-        <section class="products-section">
-            <h2>Products Sold</h2>
-            <ul id="productsList">
-                <% products.forEach(product => { %>
-                    <li>
-                        <strong>Name:</strong> <%= product.itemName %>, 
-                        <strong>Quantity:</strong> <%= product.quantity %> kg, 
-                        <strong>Price per kg:</strong> $<%= product.pricePerKg.toFixed(2) %>
-                    </li>
-                <% }) %>
-            </ul>
-        </section>
-
-        <section class="profile-section">
-            <h2>Profile</h2>
-            <button id="updateProfileBtn">Update Profile</button>
-            <div class="update-profile-form" id="updateProfileForm">
-                <form action="/vendor" method="POST">
-                    <label for="username">New Username (optional):</label>
-                    <input type="text" id="username" name="username" placeholder="Enter new username">
-
-                    <label for="password">New Password (optional):</label>
-                    <input type="password" id="password" name="password" placeholder="Enter new password">
-
-                    <button type="submit">Update Profile</button>
-                </form>
-            </div>
-        </section>
+        </div>
     </main>
 
+    <!-- Chart.js Library -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <!-- Profit Chart Script -->
     <script>
+        // Toggle Update Profile form visibility
         document.getElementById('updateProfileBtn').addEventListener('click', function() {
             const form = document.getElementById('updateProfileForm');
             form.style.display = form.style.display === 'block' ? 'none' : 'block';
         });
+
+        // Profit Bar Chart Script
+        // Profit Bar Chart Script
+    fetch('/vendor/profit-data')
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        const { productNames, profits } = data;
+
+        if (productNames && profits) {
+            const ctx = document.getElementById('profitChart').getContext('2d');
+            const profitChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: productNames, // Product names passed from the backend
+                    datasets: [{
+                        label: 'Profit (in $)',
+                        data: profits,  // Profit data passed from the backend
+                        backgroundColor: 'rgba(75, 192, 192, 0.6)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        } else {
+            console.error('No data available for chart');
+        }
+    })
+    .catch(error => console.error('Error fetching profit data:', error));
     </script>
 </body>
 </html>
